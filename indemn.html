@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050b1f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Une petite course">
+<title>Une petite course</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @property --bg{syntax:"<color>";inherits:true;initial-value:#050b1f}
+  @property --card{syntax:"<color>";inherits:true;initial-value:#0b1533}
+  @property --card2{syntax:"<color>";inherits:true;initial-value:#11204a}
+  @property --line{syntax:"<color>";inherits:true;initial-value:#1c2f66}
+  @property --glow{syntax:"<color>";inherits:true;initial-value:#0d2a7a55}
+  @property --nav{syntax:"<color>";inherits:true;initial-value:#08102aeb}
+  :root{
+    --bg:#050b1f; --card:#0b1533; --card2:#11204a; --line:#1c2f66; --glow:#0d2a7a55; --nav:#08102aeb;
+    transition:--bg 5s ease-in-out,--card 5s ease-in-out,--card2 5s ease-in-out,--line 5s ease-in-out,--glow 5s ease-in-out,--nav 5s ease-in-out;
+    --txt:#eaf1ff; --muted:#8aa0d6;
+    --run:#2f7bff; --bike:#00e5ff; --blue:#3d8bff;
+  }
+  :root.mauve{--bg:#13061f; --card:#200b38; --card2:#2d114f; --line:#45207a; --glow:#5a1a8a66; --nav:#170828eb}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0}
+  body{background:radial-gradient(1200px 600px at 80% -10%,var(--glow),transparent),var(--bg);background-attachment:fixed;color:var(--txt);font-family:Nunito,system-ui,sans-serif;font-size:15px;min-height:100vh}
+  .wrap{max-width:720px;margin:0 auto;padding:calc(18px + env(safe-area-inset-top)) 16px calc(100px + env(safe-area-inset-bottom))}
+  h1,h2,.big,.btn,.tab{font-family:Fredoka,Nunito,sans-serif}
+  h1{font-size:30px;margin:0;line-height:1.1;font-weight:800}
+  h1 .r{color:var(--run)}
+  h1 .icons{display:inline-flex;gap:4px;vertical-align:-6px;margin-left:6px}
+  h1 .ico{height:40px;width:auto;filter:drop-shadow(0 0 6px rgba(0,229,255,.35))}
+  h2{font-size:22px;margin:0 0 4px}
+  .sub{color:var(--muted);margin-top:6px}
+  .view{display:none;animation:fade .25s ease}
+  .view.on{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px;box-shadow:0 8px 30px rgba(0,10,40,.5)}
+  .stack>*+*{margin-top:14px}
+
+  /* Accueil */
+  .hero{margin:6px 0 26px}
+  .bigbtn{display:flex;align-items:center;gap:16px;width:100%;border:2px solid var(--line);background:var(--card);color:var(--txt);border-radius:22px;padding:22px 20px;font:800 24px Fredoka,Nunito,sans-serif;cursor:pointer;text-align:left;transition:transform .1s,border-color .2s,box-shadow .2s}
+  .bigbtn:active{transform:scale(.98)}
+  .bigbtn .e{width:76px;display:flex;justify-content:center;flex:none}
+  .bigbtn .big-ico{height:58px;width:auto;display:block;filter:drop-shadow(0 0 6px rgba(0,229,255,.25))}
+  .bigbtn.run .big-ico{height:72px;margin:-7px 0}
+  .bigbtn small{display:block;font:500 13px Nunito,sans-serif;color:var(--muted);margin-top:2px}
+  .bigbtn.run.on{border-color:var(--run);box-shadow:0 0 22px rgba(47,123,255,.45)}
+  .bigbtn.bike.on{border-color:var(--bike);box-shadow:0 0 22px rgba(0,229,255,.35)}
+  .bigbtn + .bigbtn{margin-top:14px}
+
+  .panel{margin-top:18px}
+  .btn{display:block;width:100%;border:0;border-radius:14px;padding:15px;font-weight:800;font-size:17px;cursor:pointer;text-align:center;color:#fff;background:var(--blue);box-shadow:0 0 18px rgba(61,139,255,.55)}
+  .btn.ghost{background:none;box-shadow:none;border:1px solid var(--line);color:var(--muted);font:600 14px Nunito,sans-serif;padding:11px}
+  .btn input{display:none}
+  .link{background:none;border:0;color:var(--muted);text-decoration:underline;font:14px Nunito,sans-serif;cursor:pointer;display:block;margin:12px auto 0}
+  .msg{min-height:20px;font-size:14px;margin-top:10px;color:var(--bike);text-align:center}
+
+  .preview .row{display:flex;gap:10px;flex-wrap:wrap}
+  .pv{flex:1;min-width:120px;background:var(--card2);border-radius:12px;padding:10px 12px}
+  .pv .lab{font-size:12px;color:var(--muted)} .pv .v{font:800 20px Fredoka,Nunito,sans-serif;margin-top:2px}
+  label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);flex:1;min-width:90px}
+  input{background:var(--bg);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px;font:16px Nunito,sans-serif;width:100%}
+  input:focus{outline:2px solid var(--bike);border-color:transparent}
+  .dur{display:flex;gap:6px} .dur input{text-align:center}
+  .fields{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+  .fields .row{display:flex;gap:10px}
+
+  /* Stats */
+  .kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+  .kpi .lab{color:var(--muted);font-size:13px}
+  .kpi .big{font-size:28px;font-weight:800;margin-top:4px;color:#fff;text-shadow:0 0 14px rgba(0,229,255,.35)}
+  .kpi .big small{font-size:14px;color:var(--muted);font-weight:500;margin-left:3px;text-shadow:none}
+  .chart svg{width:100%;height:auto;display:block}
+  .records{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .rec{background:var(--card2);border-radius:12px;padding:10px 12px}
+  .rec .lab{font-size:12px;color:var(--muted)} .rec .v{font-weight:700;margin-top:2px}
+  .badges{display:flex;flex-wrap:wrap;gap:8px}
+  .badge{display:flex;align-items:center;gap:8px;background:var(--card2);border-radius:999px;padding:7px 12px 7px 8px;font-size:13px;opacity:.35}
+  .badge.got{opacity:1;box-shadow:0 0 0 1px var(--bike) inset}
+  .badge .e{font-size:18px}
+  .item{display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+  .item:last-child{border-bottom:0}
+  .item .main{flex:1}
+  .item .t{font-weight:600}
+  .item .s{font-size:13px;color:var(--muted);margin-top:2px}
+  .del{background:none;border:1px solid var(--line);color:var(--muted);border-radius:8px;padding:5px 10px;cursor:pointer;font-size:12px}
+  .del.sure{border-color:#ff5d7a;color:#ff5d7a}
+  .empty{color:var(--muted);text-align:center;padding:30px 10px}
+  h3{font:700 17px Fredoka,Nunito,sans-serif;margin:0 0 12px}
+
+
+  .item{width:100%;background:none;border:0;border-bottom:1px solid var(--line);color:var(--txt);text-align:left;font:inherit;cursor:pointer}
+  .item:active{background:var(--card2)}
+  .chev{font-size:24px;color:var(--muted);padding-left:6px}
+  .secret{margin-top:12px;color:var(--muted);font-size:14px}
+  .sheet{position:fixed;inset:0;background:rgba(2,6,20,.6);display:flex;align-items:flex-end;justify-content:center;z-index:20;opacity:0;pointer-events:none;transition:opacity .2s}
+  .sheet.on{opacity:1;pointer-events:auto}
+  .sheet-in{position:relative;background:var(--card);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0;width:100%;max-width:560px;padding:22px 18px calc(22px + env(safe-area-inset-bottom));transform:translateY(30px);transition:transform .25s;max-height:88vh;overflow:auto}
+  .sheet.on .sheet-in{transform:none}
+  .close{position:absolute;top:14px;right:14px;background:var(--card2);border:0;color:var(--txt);width:34px;height:34px;border-radius:50%;font-size:15px;cursor:pointer}
+  .dtitle{font:800 26px Fredoka}
+  .ddate{color:var(--muted);margin-top:2px;text-transform:capitalize}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .tags span{background:var(--card2);border:1px solid var(--bike);border-radius:999px;padding:5px 11px;font-size:13px;font-weight:600}
+  .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+  .dlines{margin-top:14px;display:flex;flex-direction:column;gap:8px;font-size:14px;color:var(--txt)}
+  .dlines sup{font-size:9px}
+  .dnote{margin-top:14px;background:var(--card2);border-radius:12px;padding:10px 12px;font-size:14px}
+  .sheet .btn.ghost{margin-top:18px}
+  .btn.ghost.danger{border-color:#ff5d7a;color:#ff5d7a}
+
+
+  .shead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .xbtn{flex:none;width:40px;height:40px;border-radius:50%;border:2px solid var(--blue);background:rgba(61,139,255,.12);color:var(--blue);font-size:18px;font-weight:800;cursor:pointer;box-shadow:0 0 14px rgba(61,139,255,.6)}
+  .roll{display:block;overflow:hidden;white-space:nowrap;padding:6px 8px;margin:-6px -8px}
+  .kpi,.rec{min-width:0}
+  .strip{display:inline-block;white-space:nowrap;will-change:transform}
+  .strip .fk{padding-right:.6em}
+  .card.one{border-color:rgba(61,139,255,.6)}
+  .item.sel{background:var(--card2);border-radius:10px}
+  .item{padding-left:6px;padding-right:6px}
+
+  /* Barre d'onglets */
+  nav{position:fixed;left:0;right:0;bottom:0;background:var(--nav);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;justify-content:center;padding:8px 8px calc(8px + env(safe-area-inset-bottom));z-index:10}
+  nav .in{display:flex;max-width:520px;width:100%}
+  .tab{flex:1;background:none;border:0;color:var(--muted);display:flex;flex-direction:column;align-items:center;gap:3px;font-size:13px;font-weight:700;padding:6px 0;cursor:pointer;border-radius:12px}
+  .tab .e{font-size:24px;filter:grayscale(.6);opacity:.7}
+  .tab .nico{height:28px;width:auto;display:block}
+  .tab.on{color:var(--txt);background:var(--card2)}
+  .tab.on .e{filter:none;opacity:1}
+  .map{height:260px;border-radius:14px;overflow:hidden;background:#071233;border:1px solid var(--line)}
+  .map > svg{width:100%;height:100%;display:block}
+  .leaflet-container{background:#071233;font-family:Nunito,sans-serif}
+  .leaflet-control-attribution{background:rgba(5,11,31,.7)!important;color:#8aa0d6!important;font-size:9px!important}
+  .leaflet-control-attribution a{color:#8aa0d6!important}
+  .leaflet-bar a{background:#0d1736!important;color:#cfe3ff!important;border-color:#1c2f66!important}
+  .pin{width:16px;height:16px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 10px #1f8bff}
+  .pin.go{background:#1f8bff} .pin.end{background:#00e5ff}
+  .maplegend{display:flex;gap:16px;font-size:13px;color:var(--muted);margin-top:8px}
+  .maplegend i{display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid #fff;margin-right:6px;vertical-align:-1px}
+  .nomap{color:var(--muted);font-size:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ACCUEIL -->
+  <section class="view on" id="v-home">
+    <div class="hero">
+      <h1>Une petite <span class="r">course</span> <span class="icons"><svg class="ico" viewBox="0 0 56 48" aria-label="Cycliste pro"><g stroke-linecap="round" stroke-linejoin="round" fill="none">
+<circle cx="13" cy="35" r="9" stroke="#eaf1ff" stroke-width="2.2"/>
+<circle cx="43" cy="35" r="9" stroke="#eaf1ff" stroke-width="2.2"/>
+<path d="M13 35 L22 23 L37 23 L43 35 M22 23 L28 35 L37 23 M28 35 L13 35" stroke="#00e5ff" stroke-width="2.2"/>
+<path d="M20 21 L25 21" stroke="#eaf1ff" stroke-width="2.4"/>
+<path d="M37 23 L38 18 L42 18" stroke="#eaf1ff" stroke-width="2.2"/>
+<path d="M23 20 Q30 11 38 15" stroke="#2f7bff" stroke-width="7"/>
+<path d="M27 15.5 L33 13.5" stroke="#00e5ff" stroke-width="2"/>
+<circle cx="41.5" cy="12" r="3.8" fill="#ffd2a8" stroke="none"/>
+<path d="M37.2 11 Q41 5.6 46.4 9.8 L44 11 Z" fill="#00e5ff" stroke="#00e5ff" stroke-width="1"/>
+<path d="M44 12.6 L46.6 12.6" stroke="#0b1533" stroke-width="1.8"/>
+<path d="M38 16 L41.5 18.5" stroke="#ffd2a8" stroke-width="2.6"/>
+<path d="M23 21 L30 26 L27 33" stroke="#0b1533" stroke-width="5.4"/>
+<path d="M28.5 29 L27.5 34" stroke="#ffd2a8" stroke-width="2.6"/>
+<path d="M26 35.5 L30 35.5" stroke="#00e5ff" stroke-width="2.6"/>
+</g></svg><svg class="ico" viewBox="0 0 48 48" aria-label="Coureur pro"><g stroke-linecap="round" stroke-linejoin="round" fill="none">
+<circle cx="28" cy="9" r="4.2" fill="#ffd2a8" stroke="none"/>
+<path d="M23.8 7.6 Q28 5.4 32.2 7.6" stroke="#00e5ff" stroke-width="2.2"/>
+<path d="M31.8 7.4 l4 -1.6" stroke="#00e5ff" stroke-width="1.6"/>
+<path d="M26.5 14 L23 26" stroke="#2f7bff" stroke-width="7"/>
+<rect x="21.6" y="17.4" width="5.6" height="4.6" rx="1" fill="#fff" transform="rotate(16 24.4 19.7)"/>
+<text x="24.4" y="21.2" font-size="4" font-weight="700" text-anchor="middle" fill="#0b1533" font-family="Nunito,sans-serif" transform="rotate(16 24.4 19.7)">1</text>
+<path d="M26 16 L33 20 L37 16" stroke="#ffd2a8" stroke-width="2.6"/>
+<path d="M25 16.5 L18.5 13.5 L15.5 19" stroke="#ffd2a8" stroke-width="2.6"/>
+<path d="M23 26 L20.5 29" stroke="#0b1533" stroke-width="6"/>
+<path d="M22 28 L30 34 L29 42" stroke="#ffd2a8" stroke-width="2.8"/>
+<path d="M20 28 L14 35 L8 34" stroke="#ffd2a8" stroke-width="2.8"/>
+<path d="M27 42.5 L32 42.5" stroke="#00e5ff" stroke-width="3"/>
+<path d="M7 31.8 L7.5 36.5" stroke="#00e5ff" stroke-width="3"/>
+</g></svg></span></h1>
+      <div class="sub">Qu'est-ce que tu as fait aujourd'hui ? 💪</div>
+    </div>
+
+    <button class="bigbtn run" data-s="run"><span class="e"><svg class="big-ico" viewBox="0 0 64 64" aria-label="Coureur">
+<defs>
+ <linearGradient id="rSing" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5aa0ff"/><stop offset="1" stop-color="#1f5fe0"/></linearGradient>
+ <linearGradient id="rSkin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f6cfa8"/><stop offset="1" stop-color="#e3a97c"/></linearGradient>
+</defs>
+<ellipse cx="32" cy="60" rx="17" ry="2.2" fill="#000" opacity=".35"/>
+<g stroke-linecap="round" stroke-linejoin="round" fill="none">
+ <!-- jambe arrière (plus sombre) -->
+ <path d="M30 34 L23.5 42 L15.5 45.5" stroke="#c98d63" stroke-width="4.6"/>
+ <path d="M16.8 43.2 L11.6 44.6 L12.4 47.6 L17.6 47.4 Z" fill="#00b8d4" stroke="#00b8d4" stroke-width="1.6"/>
+ <!-- bras arrière (plus sombre), coude vers le haut -->
+ <path d="M34.5 18.5 L28.5 15.5 L25.5 21.5" stroke="#c98d63" stroke-width="3.6"/>
+ <!-- short -->
+ <path d="M27.5 30.5 L35 32 L36.5 37 L31 38.5 L26 36 Z" fill="#111a33"/>
+ <!-- maillot -->
+ <path d="M33.5 15.5 Q39 15.5 39.5 19 L36 32.5 L27.5 31 L30 19 Q31 15.8 33.5 15.5 Z" fill="url(#rSing)"/>
+ <path d="M38.6 18 L35.2 31.6" stroke="#00e5ff" stroke-width="1.4"/>
+ <!-- dossard -->
+ <g transform="rotate(14 32.5 24.5)"><rect x="29" y="21.5" width="7" height="6" rx="1" fill="#fff"/>
+ <text x="32.5" y="26.3" font-size="4.6" font-weight="800" text-anchor="middle" fill="#0b1533" font-family="Nunito,Arial,sans-serif" stroke="none">1</text></g>
+ <!-- jambe avant -->
+ <path d="M33 35 L41.5 41.5 L39.5 52" stroke="url(#rSkin)" stroke-width="5"/>
+ <path d="M38 50.6 L44.8 51.4 Q46.2 53.6 44.2 54.4 L37.6 54.2 Z" fill="#00e5ff" stroke="#00e5ff" stroke-width="1.4"/>
+ <path d="M38.2 53.9 L45 54.1" stroke="#fff" stroke-width="1"/>
+ <!-- bras avant -->
+ <path d="M36.5 19 L41 26 L46.5 21.5" stroke="url(#rSkin)" stroke-width="3.8"/>
+ <!-- cou + tête -->
+ <path d="M35.5 15.5 L36.6 12.8" stroke="#e3a97c" stroke-width="3.4"/>
+ <circle cx="38.2" cy="9.2" r="5" fill="url(#rSkin)" stroke="none"/>
+ <path d="M33.6 8.4 Q34.5 4 38.6 4 Q42.6 4.2 43 7.4 Z" fill="#3a2a1e" stroke="none"/>
+ <!-- casquette -->
+ <path d="M33.2 7.6 Q35 3.2 39.6 3.6 Q42.8 4.2 43.2 7 L46.8 7.6 Q46 8.6 43 8.6 L33.4 8.8 Z" fill="#00e5ff" stroke="none"/>
+ <!-- lunettes -->
+ <path d="M38.6 9.6 L43.2 9.4 Q43.2 11.2 41.4 11.2 Q39.4 11.2 38.6 9.6 Z" fill="#0b1533" stroke="none"/>
+ <path d="M41.6 9.9 L42.6 9.9" stroke="#8be9ff" stroke-width=".6"/>
+ <path d="M36 9.6 L38.8 9.6" stroke="#0b1533" stroke-width=".8"/>
+</g>
+</svg>
+</span><span>Course à pied<small>Ajouter une course</small></span></button>
+    <button class="bigbtn bike" data-s="bike"><span class="e"><svg class="big-ico" viewBox="0 0 72 56" aria-label="Cycliste">
+<defs>
+ <linearGradient id="cFrame" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#00e5ff"/><stop offset="1" stop-color="#2f7bff"/></linearGradient>
+ <linearGradient id="cJer" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#5aa0ff"/><stop offset="1" stop-color="#1f5fe0"/></linearGradient>
+ <linearGradient id="cSkin" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f6cfa8"/><stop offset="1" stop-color="#e3a97c"/></linearGradient>
+</defs>
+<ellipse cx="36" cy="53.5" rx="30" ry="2" fill="#000" opacity=".35"/>
+<g stroke-linecap="round" stroke-linejoin="round" fill="none">
+ <!-- roues -->
+ <g id="w1">
+  <circle cx="15" cy="40" r="11" stroke="#1a1f2e" stroke-width="3"/>
+  <circle cx="15" cy="40" r="9.2" stroke="#c9d3ea" stroke-width="1"/>
+  <path d="M15 31 V49 M6 40 H24 M8.6 33.6 L21.4 46.4 M21.4 33.6 L8.6 46.4" stroke="#c9d3ea" stroke-width=".45"/>
+  <circle cx="15" cy="40" r="1.4" fill="#c9d3ea" stroke="none"/>
+ </g>
+ <g>
+  <circle cx="56" cy="40" r="11" stroke="#1a1f2e" stroke-width="3"/>
+  <circle cx="56" cy="40" r="9.2" stroke="#c9d3ea" stroke-width="1"/>
+  <path d="M56 31 V49 M47 40 H65 M49.6 33.6 L62.4 46.4 M62.4 33.6 L49.6 46.4" stroke="#c9d3ea" stroke-width=".45"/>
+  <circle cx="56" cy="40" r="1.4" fill="#c9d3ea" stroke="none"/>
+ </g>
+ <!-- jambe arrière (sombre) -->
+ <path d="M26.5 22 L33.5 30 L31 36.5" stroke="#c98d63" stroke-width="4"/>
+ <path d="M29.4 36 L34 36.4" stroke="#0b1533" stroke-width="2.6"/>
+ <!-- cadre -->
+ <path d="M15 40 L24 25 L47 25.5 L56 40 M24 25 L31.5 40 L47 25.5 M31.5 40 L15 40" stroke="url(#cFrame)" stroke-width="2.6"/>
+ <path d="M47 25.5 L48.2 20.5" stroke="#2f7bff" stroke-width="2.6"/>
+ <!-- cintre de route -->
+ <path d="M46.6 20.8 L52 20.2 Q54.6 20.4 54.2 23.4 Q53.8 25.6 51.6 25.2" stroke="#e8eefc" stroke-width="1.8"/>
+ <!-- selle -->
+ <path d="M20.5 22.6 L28.5 22.2 Q27.8 23.8 26 24 L21.8 24 Z" fill="#111a33" stroke="#111a33" stroke-width="1"/>
+ <path d="M24 24 L24.5 25.5" stroke="#c9d3ea" stroke-width="1.6"/>
+ <!-- pédalier -->
+ <circle cx="31.5" cy="40" r="3.4" stroke="#c9d3ea" stroke-width="1.2"/>
+ <path d="M31.5 40 L35 45.5" stroke="#c9d3ea" stroke-width="1.8"/>
+ <!-- cuissard -->
+ <path d="M22 19.5 Q25.5 17.5 29.5 19.5 L31.5 25.5 L25.5 25.5 Q22 24 22 19.5 Z" fill="#111a33" stroke="none"/>
+ <!-- maillot (dos plat, position aéro) -->
+ <path d="M23 20 Q31 10.5 42 13.2 L43.5 17.8 Q33 17.2 27.5 22.6 Z" fill="url(#cJer)" stroke="none"/>
+ <path d="M26.5 17.6 Q33 12.6 41.6 14.6" stroke="#00e5ff" stroke-width="1.2"/>
+ <!-- jambe avant -->
+ <path d="M28.5 21.5 L38 30.5 L35.6 44" stroke="url(#cSkin)" stroke-width="4.4"/>
+ <path d="M33.4 44.6 L39 45 Q39.6 46.8 38.2 47 L33.2 46.8 Z" fill="#0b1533" stroke="#0b1533" stroke-width="1"/>
+ <!-- bras -->
+ <path d="M41.5 15.5 L45.5 20.2 L50.8 20.4" stroke="url(#cSkin)" stroke-width="3.2"/>
+ <path d="M41 15.2 L44.4 19.2" stroke="#1f5fe0" stroke-width="3.4"/>
+ <!-- tête -->
+ <circle cx="46.4" cy="11.6" r="4.2" fill="url(#cSkin)" stroke="none"/>
+ <!-- casque aéro avec aérations -->
+ <path d="M41.4 11.2 Q42.4 5.6 47.6 5.8 Q51.4 6.2 51.6 10 L49.6 10.6 L42 11.8 Z" fill="#00e5ff" stroke="none"/>
+ <path d="M44 8 L46 7.4 M47 7 L49 7.2" stroke="#0b1533" stroke-width=".9"/>
+ <path d="M41.4 11.2 L37.6 10.4 Q39 9 41.8 9.4" fill="#00b8d4" stroke="none"/>
+ <!-- lunettes -->
+ <path d="M46.6 11.6 L51 11.2 Q51 13 49.2 13 Q47.4 13 46.6 11.6 Z" fill="#0b1533" stroke="none"/>
+ <path d="M49.2 11.7 L50.2 11.7" stroke="#8be9ff" stroke-width=".6"/>
+</g>
+</svg>
+</span><span>Vélo<small>Ajouter une sortie vélo</small></span></button>
+
+    <div class="panel" id="panel" hidden>
+      <!-- étape 1 : importer -->
+      <div id="step-import">
+        <label class="btn" for="gpx">📂 Importer ma sortie<input type="file" id="gpx"></label>
+      </div>
+      <!-- étape 2 : vérifier et enregistrer -->
+      <div class="card preview" id="step-check" hidden>
+        <h3 id="checkTitle">Ta sortie</h3>
+        <div class="row" id="pvBoxes"></div>
+        <div class="fields">
+          <div class="row">
+            <label>Date<input type="date" id="date"></label>
+            <label>Distance (km)<input type="number" id="dist" min="0.1" step="0.01" inputmode="decimal"></label>
+          </div>
+          <label>Durée (h · min · s)
+            <div class="dur">
+              <input type="number" id="hh" min="0" placeholder="h" inputmode="numeric">
+              <input type="number" id="mm" min="0" max="59" placeholder="min" inputmode="numeric">
+              <input type="number" id="ss" min="0" max="59" placeholder="s" inputmode="numeric">
+            </div>
+          </label>
+          <label>Petit commentaire (facultatif)<input type="text" id="note" maxlength="80" placeholder="Avec papa, il pleuvait…"></label>
+        </div>
+        <button class="btn" id="saveBtn">Enregistrer ✓</button>
+        <button class="link" id="cancelBtn">Annuler</button>
+      </div>
+      <div class="msg" id="msg"></div>
+    </div>
+  </section>
+
+  <!-- STATS COURSE / VÉLO -->
+  <section class="view" id="v-run"></section>
+  <section class="view" id="v-bike"></section>
+</div>
+
+<nav><div class="in">
+  <button class="tab on" data-v="home"><span class="e">🏠</span>Accueil</button>
+  <button class="tab" data-v="run"><span class="e"><svg class="nico" viewBox="0 0 48 48" aria-label="Coureur pro"><g stroke-linecap="round" stroke-linejoin="round" fill="none">
+<circle cx="28" cy="9" r="4.2" fill="#ffd2a8" stroke="none"/>
+<path d="M23.8 7.6 Q28 5.4 32.2 7.6" stroke="#00e5ff" stroke-width="2.2"/>
+<path d="M31.8 7.4 l4 -1.6" stroke="#00e5ff" stroke-width="1.6"/>
+<path d="M26.5 14 L23 26" stroke="#2f7bff" stroke-width="7"/>
+<rect x="21.6" y="17.4" width="5.6" height="4.6" rx="1" fill="#fff" transform="rotate(16 24.4 19.7)"/>
+<text x="24.4" y="21.2" font-size="4" font-weight="700" text-anchor="middle" fill="#0b1533" font-family="Nunito,sans-serif" transform="rotate(16 24.4 19.7)">1</text>
+<path d="M26 16 L33 20 L37 16" stroke="#ffd2a8" stroke-width="2.6"/>
+<path d="M25 16.5 L18.5 13.5 L15.5 19" stroke="#ffd2a8" stroke-width="2.6"/>
+<path d="M23 26 L20.5 29" stroke="#0b1533" stroke-width="6"/>
+<path d="M22 28 L30 34 L29 42" stroke="#ffd2a8" stroke-width="2.8"/>
+<path d="M20 28 L14 35 L8 34" stroke="#ffd2a8" stroke-width="2.8"/>
+<path d="M27 42.5 L32 42.5" stroke="#00e5ff" stroke-width="3"/>
+<path d="M7 31.8 L7.5 36.5" stroke="#00e5ff" stroke-width="3"/>
+</g></svg></span>Stats course</button>
+  <button class="tab" data-v="bike"><span class="e"><svg class="nico" viewBox="0 0 56 48" aria-label="Cycliste pro"><g stroke-linecap="round" stroke-linejoin="round" fill="none">
+<circle cx="13" cy="35" r="9" stroke="#eaf1ff" stroke-width="2.2"/>
+<circle cx="43" cy="35" r="9" stroke="#eaf1ff" stroke-width="2.2"/>
+<path d="M13 35 L22 23 L37 23 L43 35 M22 23 L28 35 L37 23 M28 35 L13 35" stroke="#00e5ff" stroke-width="2.2"/>
+<path d="M20 21 L25 21" stroke="#eaf1ff" stroke-width="2.4"/>
+<path d="M37 23 L38 18 L42 18" stroke="#eaf1ff" stroke-width="2.2"/>
+<path d="M23 20 Q30 11 38 15" stroke="#2f7bff" stroke-width="7"/>
+<path d="M27 15.5 L33 13.5" stroke="#00e5ff" stroke-width="2"/>
+<circle cx="41.5" cy="12" r="3.8" fill="#ffd2a8" stroke="none"/>
+<path d="M37.2 11 Q41 5.6 46.4 9.8 L44 11 Z" fill="#00e5ff" stroke="#00e5ff" stroke-width="1"/>
+<path d="M44 12.6 L46.6 12.6" stroke="#0b1533" stroke-width="1.8"/>
+<path d="M38 16 L41.5 18.5" stroke="#ffd2a8" stroke-width="2.6"/>
+<path d="M23 21 L30 26 L27 33" stroke="#0b1533" stroke-width="5.4"/>
+<path d="M28.5 29 L27.5 34" stroke="#ffd2a8" stroke-width="2.6"/>
+<path d="M26 35.5 L30 35.5" stroke="#00e5ff" stroke-width="2.6"/>
+</g></svg></span>Stats vélo</button>
+</div></nav>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+  // ---------- sauvegarde (dans le téléphone) ----------
+  const LS = "sport-stats-leon";
+  let sessions = [];
+  try { sessions = JSON.parse(localStorage.getItem(LS)) || []; } catch(e){ sessions = []; }
+  const save = () => { try { localStorage.setItem(LS, JSON.stringify(sessions)); } catch(e){} };
+
+  // ---------- on enlève les fausses stats d'exemple ----------
+  if (sessions.some(s=>s.demo)) { sessions = sessions.filter(s=>!s.demo); save(); }
+
+  // ---------- outils ----------
+  const fmtKm = n => (Math.round(n*10)/10).toLocaleString("fr-BE");
+  function fmtDur(sec){
+    sec = Math.round(sec); const h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s = sec%60;
+    return h ? `${h}h${String(m).padStart(2,"0")}` : `${m}min${s?(" "+String(s).padStart(2,"0")+"s"):""}`;
+  }
+  const pace = (sec,km) => { const p = sec/km; let m = Math.floor(p/60), s = Math.round(p%60); if (s===60){m++;s=0;} return `${m}:${String(s).padStart(2,"0")} /km`; };
+  const speed = (sec,km) => (km/(sec/3600)).toLocaleString("fr-BE",{maximumFractionDigits:1}) + " km/h";
+  const effort = (s) => s.sport==="run" ? pace(s.sec,s.km) : speed(s.sec,s.km);
+  const fmtDate = d => new Date(d+"T12:00").toLocaleDateString("fr-BE",{weekday:"short",day:"numeric",month:"short"});
+  const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+  const mondayOf = d => { const x = new Date(d); x.setHours(12,0,0,0); x.setDate(x.getDate()-(x.getDay()+6)%7); return x; };
+  const NAME = { run:"course", bike:"sortie vélo" };
+
+  // ---------- onglets ----------
+  function show(v){
+    document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on", x.id==="v-"+v));
+    document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on", x.dataset.v===v));
+    if (v==="home") document.documentElement.classList.remove("mauve");
+    if (v!=="home") renderStats(v);
+    window.scrollTo(0,0);
+  }
+  document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click", ()=>{
+    // changer d'onglet ferme la sortie ouverte : on revient aux stats globales
+    focus.run = null; focus.bike = null; sureDel = false;
+    show(t.dataset.v);
+  }));
+
+  // ---------- accueil ----------
+  let sport = null, pendingTrack = null;
+  function resetPanel(){
+    pendingTrack = null;
+    $("step-import").hidden = false; $("step-check").hidden = true;
+    ["dist","hh","mm","ss","note"].forEach(id=>$(id).value="");
+    $("pvBoxes").innerHTML = ""; $("msg").textContent = "";
+  }
+  document.querySelectorAll(".bigbtn").forEach(b=>b.addEventListener("click", ()=>{
+    if (sport === b.dataset.s) {
+      sport = null; b.classList.remove("on"); $("panel").hidden = true; resetPanel(); return;
+    }
+    sport = b.dataset.s;
+    document.querySelectorAll(".bigbtn").forEach(x=>x.classList.toggle("on", x===b));
+    $("panel").hidden = false; resetPanel();
+  }));
+
+  function openCheck(title){
+    $("step-import").hidden = true; $("step-check").hidden = false;
+    $("checkTitle").textContent = title;
+    if (!$("date").value) $("date").value = today();
+    updatePreview();
+  }
+  function readForm(){
+    const km = parseFloat($("dist").value);
+    const sec = (+$("hh").value||0)*3600 + (+$("mm").value||0)*60 + (+$("ss").value||0);
+    return {km, sec};
+  }
+  function updatePreview(){
+    const {km, sec} = readForm();
+    const boxes = [];
+    if (km>0) boxes.push(["Distance", fmtKm(km)+" km"]);
+    if (sec>0) boxes.push(["Durée", fmtDur(sec)]);
+    if (km>0 && sec>0) boxes.push([sport==="run"?"Allure":"Vitesse", sport==="run"?pace(sec,km):speed(sec,km)]);
+    $("pvBoxes").innerHTML = boxes.map(([l,v])=>`<div class="pv"><div class="lab">${l}</div><div class="v">${v}</div></div>`).join("");
+  }
+  ["dist","hh","mm","ss"].forEach(id=>$(id).addEventListener("input", updatePreview));
+
+  $("cancelBtn").addEventListener("click", resetPanel);
+
+  // lecture du fichier GPX
+  function hav(a,b){
+    const R=6371, r=x=>x*Math.PI/180;
+    const dLa=r(b.lat-a.lat), dLo=r(b.lon-a.lon);
+    const h=Math.sin(dLa/2)**2+Math.cos(r(a.lat))*Math.cos(r(b.lat))*Math.sin(dLo/2)**2;
+    return 2*R*Math.asin(Math.sqrt(h));
+  }
+  $("gpx").addEventListener("change", async e=>{
+    const file = e.target.files && e.target.files[0]; if (!file) return;
+    try{
+      const xml = new DOMParser().parseFromString(await file.text(), "application/xml");
+      const pts = [...xml.getElementsByTagName("trkpt")].map(p=>{
+        const t = p.getElementsByTagName("time")[0];
+        return { lat:+p.getAttribute("lat"), lon:+p.getAttribute("lon"), t: t? Date.parse(t.textContent) : NaN };
+      }).filter(p=>isFinite(p.lat)&&isFinite(p.lon));
+      if (pts.length < 2) { $("msg").textContent = "Ce fichier ne contient pas de trajet 😕 Le GPS n'a peut-être pas marché."; e.target.value=""; return; }
+      let km = 0; for (let i=1;i<pts.length;i++) km += hav(pts[i-1], pts[i]);
+      const stepN = Math.max(1, Math.ceil(pts.length/400));
+      pendingTrack = pts.filter((p,i)=> i%stepN===0 || i===pts.length-1).map(p=>[+p.lat.toFixed(5), +p.lon.toFixed(5)]);
+      const times = pts.map(p=>p.t).filter(isFinite);
+      const sec = times.length>=2 ? Math.round((times[times.length-1]-times[0])/1000) : 0;
+      $("dist").value = Math.round(km*100)/100;
+      if (sec>0){ $("hh").value = Math.floor(sec/3600) || ""; $("mm").value = Math.floor(sec%3600/60); $("ss").value = sec%60; }
+      if (times.length){ const d = new Date(times[0]); $("date").value = new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+      openCheck(sport==="run" ? "🏃 Ta course est lue !" : "🚴 Ta sortie est lue !");
+      $("msg").textContent = sec>0 ? "Vérifie, puis appuie sur Enregistrer 👍" : "Ajoute la durée, puis Enregistrer 👍";
+    }catch(err){ $("msg").textContent = "Je n'arrive pas à lire ce fichier 😕"; }
+    e.target.value = "";
+  });
+
+  $("saveBtn").addEventListener("click", ()=>{
+    const {km, sec} = readForm();
+    if (!(km>0)) { $("msg").textContent = "Indique une distance 😉"; return; }
+    if (!(sec>0)) { $("msg").textContent = "Indique combien de temps ça a duré ⏱️"; return; }
+    const spd = km/(sec/3600);
+    if ((sport==="run" && spd>30) || (sport==="bike" && spd>80)) { $("msg").textContent = "Hmm, c'est super rapide ! Vérifie la distance et la durée 🤔"; return; }
+    const first = !sessions.some(s=>s.sport===sport);
+    const entry = { id: Date.now(), sport, date: $("date").value || today(), km, sec, note: $("note").value.trim() };
+    if (pendingTrack) entry.track = pendingTrack;
+    sessions.push(entry);
+    save();
+    toast = first ? `Bravo pour ta première ${NAME[sport]} ! 🎉` : `Bien joué ! ${fmtKm(km)} km de plus 💪`;
+    const s = sport;
+    sport = null; document.querySelectorAll(".bigbtn").forEach(x=>x.classList.remove("on"));
+    $("panel").hidden = true; resetPanel();
+    show(s);
+  });
+
+
+  // ---------- stats ----------
+  let toast = "", sureDel = false; const focus = { run:null, bike:null };
+  const BADGES = {
+    run: [
+      ["🎉","Première course", L=>L.length>=1],
+      ["🏃","Premier 5 km", L=>L.some(s=>s.km>=5)],
+      ["🔥","Premier 10 km", L=>L.some(s=>s.km>=10)],
+      ["🥇","Semi-marathon (21 km)", L=>L.some(s=>s.km>=21.1)],
+      ["⭐","10 courses", L=>L.length>=10],
+      ["🏅","50 km au total", L=>L.reduce((a,s)=>a+s.km,0)>=50],
+      ["🏆","200 km au total", L=>L.reduce((a,s)=>a+s.km,0)>=200],
+    ],
+    bike: [
+      ["🎉","Première sortie", L=>L.length>=1],
+      ["🚴","Sortie de 20 km", L=>L.some(s=>s.km>=20)],
+      ["🚀","Sortie de 50 km", L=>L.some(s=>s.km>=50)],
+      ["💯","Sortie de 100 km", L=>L.some(s=>s.km>=100)],
+      ["⭐","10 sorties", L=>L.length>=10],
+      ["🏅","200 km au total", L=>L.reduce((a,s)=>a+s.km,0)>=200],
+      ["🌍","1000 km au total", L=>L.reduce((a,s)=>a+s.km,0)>=1000],
+    ]
+  };
+
+  function chart(list, color){
+    const weeks = []; const m0 = mondayOf(new Date());
+    for (let i=7;i>=0;i--){ const d = new Date(m0); d.setDate(d.getDate()-7*i); weeks.push({start:d, km:0}); }
+    list.forEach(s=>{ const m = mondayOf(new Date(s.date+"T12:00")).getTime(); const w = weeks.find(w=>w.start.getTime()===m); if (w) w.km+=s.km; });
+    const max = Math.max(5, ...weeks.map(w=>w.km))*1.12;
+    const W=440,H=200,pad=28,top=22,bottom=24, step=(W-pad-30)/7;
+    const X = i => pad + 7 + i*step, Y = v => H-bottom-(H-bottom-top)*v/max;
+    let g = "";
+    [0,.5,1].forEach(t=>{ const v=max*t, y=Y(v); g+=`<line x1="${pad}" x2="${W}" y1="${y}" y2="${y}" stroke="#1c2f66"/><text x="${pad-6}" y="${y+4}" fill="#8aa0d6" font-size="10" text-anchor="end">${Math.round(v)}</text>`; });
+    const pts = weeks.map((w,i)=>[X(i), Y(w.km)]);
+    const line = pts.map((p,i)=>(i?"L":"M")+p[0].toFixed(1)+" "+p[1].toFixed(1)).join(" ");
+    const gid = "grad"+color.slice(1);
+    g += `<defs><linearGradient id="${gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${color}" stop-opacity=".35"/><stop offset="1" stop-color="${color}" stop-opacity="0"/></linearGradient></defs>`;
+    g += `<path d="${line} L${pts[7][0].toFixed(1)} ${H-bottom} L${pts[0][0].toFixed(1)} ${H-bottom} Z" fill="url(#${gid})"/>`;
+    g += `<path d="${line}" fill="none" stroke="${color}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round" style="filter:drop-shadow(0 0 4px ${color})"/>`;
+    weeks.forEach((w,i)=>{
+      const [x,y] = pts[i];
+      g += `<circle cx="${x}" cy="${y}" r="4.5" fill="#050b1f" stroke="${color}" stroke-width="2.4"/>`;
+      if (w.km) g += `<text x="${x}" y="${y-10}" fill="#eaf1ff" font-size="10" text-anchor="middle">${fmtKm(w.km)}</text>`;
+      g += `<text x="${x}" y="${H-6}" fill="#8aa0d6" font-size="10" text-anchor="middle">${w.start.getDate()}/${w.start.getMonth()+1}</text>`;
+    });
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Kilomètres par semaine">${g}</svg>`;
+  }
+
+  // ---------- défilement des chiffres ----------
+  function fakeLike(txt){
+    return txt.replace(/\d/g, ()=>Math.floor(Math.random()*10));
+  }
+  function spin(el){
+    const cells = el.querySelectorAll(".roll");
+    const T = 3000, T1 = 1500;
+    cells.forEach(c=>{
+      const final = c.innerHTML;
+      const plain = c.textContent;
+      let strip = "";
+      for (let i=0;i<70;i++) strip += `<span class="fk">${fakeLike(plain)}</span>`;
+      c.innerHTML = `<span class="strip">${strip}<span class="fin">${final}</span></span>`;
+    });
+    const items = [...cells].map(c=>{ const st=c.firstChild, fin=st.lastChild; return {st, D: fin.offsetLeft}; });
+    const t0 = performance.now();
+    function frame(now){
+      const t = Math.min(now - t0, T);
+      items.forEach(({st,D})=>{
+        const v = D / (T1 + (T-T1)/2);           // vitesse constante, puis freinage régulier
+        const x = t<=T1 ? v*t : v*T1 + v*(t-T1) - v*(t-T1)*(t-T1)/(2*(T-T1));
+        st.style.transform = `translateX(${-x}px)`;
+      });
+      if (t < T) requestAnimationFrame(frame);
+      else cells.forEach(c=>{ const f=c.querySelector(".fin"); if (f) c.innerHTML = f.innerHTML; });
+    }
+    requestAnimationFrame(frame);
+  }
+
+  function renderStats(sp, animate){
+    const el = $("v-"+sp);
+    const L = sessions.filter(s=>s.sport===sp);
+    const isRun = sp==="run";
+    const color = isRun ? "#2f7bff" : "#00e5ff";
+    const title = isRun ? "🏃 Stats course à pied" : "🚴 Stats vélo";
+    if (focus[sp] && !L.some(s=>s.id===focus[sp])) focus[sp] = null;
+    const one = focus[sp] ? L.find(s=>s.id===focus[sp]) : null;
+    document.documentElement.classList.toggle("mauve", !!one);
+    const msg = toast; toast = "";
+    if (!L.length){
+      el.innerHTML = `<h2>${title}</h2>${msg?`<div class="msg" style="text-align:left">${msg}</div>`:""}<div class="card empty" style="margin-top:14px">Pas encore de ${NAME[sp]} ici.<br>Va dans <b>Accueil</b> pour en ajouter une ! 👟</div>`;
+      return;
+    }
+    const roll = v => `<span class="roll">${v}</span>`;
+    let head, kpis, recTitle, recs, extra = "";
+    if (!one){
+      const km = L.reduce((a,s)=>a+s.km,0), sec = L.reduce((a,s)=>a+s.sec,0);
+      const longest = L.reduce((a,b)=>b.km>a.km?b:a);
+      const fastPool = isRun ? L.filter(s=>s.km>=1) : L;
+      const fastest = fastPool.length ? fastPool.reduce((a,b)=> (b.km/b.sec)>(a.km/a.sec)?b:a) : null;
+      head = `<div class="shead"><h2>${title}</h2></div>`;
+      kpis = [["Distance totale", `${fmtKm(km)}<small>km</small>`],[isRun?"Courses":"Sorties", L.length],["Temps total", fmtDur(sec)],[isRun?"Allure moyenne":"Vitesse moyenne", isRun?pace(sec,km):speed(sec,km)]];
+      recTitle = "Mes records";
+      recs = [["Plus longue", fmtKm(longest.km)+" km"],[isRun?"Meilleure allure":"Plus rapide", fastest?effort(fastest):"–"]];
+    } else {
+      const n = L.length;
+      const rankKm = [...L].sort((a,b)=>b.km-a.km).findIndex(x=>x.id===one.id)+1;
+      const rankSpd = [...L].sort((a,b)=>(b.km/b.sec)-(a.km/a.sec)).findIndex(x=>x.id===one.id)+1;
+      const avg = L.reduce((a,x)=>a+x.km,0)/n, diff = one.km-avg;
+      const d = new Date(one.date+"T12:00").toLocaleDateString("fr-BE",{weekday:"short",day:"numeric",month:"short"});
+      head = `<div class="shead"><h2>${isRun?"🏃 Course":"🚴 Sortie"} · ${d}</h2><button class="xbtn" id="xbtn" aria-label="Retour aux stats globales">✕</button></div>`;
+      kpis = [["Distance", `${fmtKm(one.km)}<small>km</small>`],["Classement", `${rankKm}<small>/${n}</small>`],["Durée", fmtDur(one.sec)],[isRun?"Allure":"Vitesse moyenne", effort(one)]];
+      recTitle = "Comparée aux autres";
+      recs = [["Rang vitesse", `${rankSpd}/${n}`],["Par rapport à ta moyenne", (diff>=0?"+":"−")+fmtKm(Math.abs(diff))+" km"],[isRun?"Vitesse moyenne":"Allure", isRun?speed(one.sec,one.km):pace(one.sec,one.km)]];
+      const tags = [];
+      if (n>1 && rankKm===1) tags.push("🏆 Ta plus longue !");
+      if (n>1 && rankSpd===1) tags.push(isRun?"⚡ Ta meilleure allure !":"⚡ Ta plus rapide !");
+      extra = `${tags.length?`<div class="tags">${tags.map(t=>`<span>${t}</span>`).join("")}</div>`:""}${one.note?`<div class="dnote">💬 ${esc(one.note)}</div>`:""}<button class="btn ghost" id="delBtn">Supprimer cette ${isRun?"course":"sortie"}</button>`;
+    }
+    const got = BADGES[sp].filter(b=>b[2](L)), hidden = BADGES[sp].length - got.length;
+    const items = [...L].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).map(s=>`
+      <button class="item ${one&&one.id===s.id?"sel":""}" data-id="${s.id}">
+        <div class="main"><div class="t">${fmtKm(s.km)} km · ${fmtDur(s.sec)}</div>
+        <div class="s">${fmtDate(s.date)} · ${effort(s)}${s.note?` · ${esc(s.note)}`:""}</div></div>
+        <span class="chev">›</span>
+      </button>`).join("");
+    el.innerHTML = head + (msg?`<div class="msg" style="text-align:left">${msg}</div>`:"") + `
+      ${one?"":`<div class="card chart" style="margin-top:14px"><h3>Mes km des 8 dernières semaines</h3>${chart(L,color)}</div>`}
+      <div class="kpis">${kpis.map(([l,v])=>`<div class="card kpi ${one?"one":""}"><div class="lab">${l}</div><div class="big">${roll(v)}</div></div>`).join("")}</div>
+      <div class="stack" style="margin-top:14px">
+        ${one ? `<div class="card"><h3>Mon parcours 🗺️</h3>${one.track && one.track.length>1
+            ? `<div class="map"></div><div class="maplegend"><span><i style="background:#1f8bff"></i>Départ</span><span><i style="background:#00e5ff"></i>Arrivée</span></div>`
+            : `<div class="nomap">Pas de carte pour cette ${isRun?"course":"sortie"} : elle n'a pas été importée avec un fichier GPX. Les prochaines que tu importes auront leur carte ! 📂</div>`}</div>`
+          : ""}
+        <div class="card ${one?"one":""}"><h3>${recTitle}</h3><div class="records">${recs.map(([l,v])=>`<div class="rec"><div class="lab">${l}</div><div class="v">${roll(v)}</div></div>`).join("")}</div>${extra}</div>
+        <div class="card"><h3>Mes badges 🏅</h3><div class="badges">${got.map(([e,t])=>`<div class="badge got"><span class="e">${e}</span>${t}</div>`).join("")}</div>${hidden?`<div class="secret">🎁 Encore ${hidden} badge${hidden>1?"s":""} secret${hidden>1?"s":""} à découvrir…</div>`:`<div class="secret">🏆 Tu as tous les badges, champion !</div>`}</div>
+        <div class="card"><h3>Toutes mes ${isRun?"courses":"sorties"}</h3>${items}</div>
+      </div>`;
+    el.querySelectorAll(".item").forEach(b=>b.addEventListener("click", ()=>{
+      focus[sp] = +b.dataset.id; sureDel = false;
+      window.scrollTo({top:0, behavior:"smooth"});
+      renderStats(sp, true);
+    }));
+    if ($("xbtn")) $("xbtn").addEventListener("click", ()=>{ focus[sp] = null; renderStats(sp, true); });
+    if ($("delBtn")) $("delBtn").addEventListener("click", ()=>{
+      if (!sureDel){ sureDel = true; $("delBtn").textContent = "Appuie encore pour confirmer"; $("delBtn").classList.add("danger"); return; }
+      sessions = sessions.filter(x=>x.id!==one.id); save(); focus[sp] = null; sureDel = false; renderStats(sp, true);
+    });
+    if (one && one.track && one.track.length>1) drawMap(el.querySelector(".map"), one.track, color, !!one.demo, one.id);
+    if (animate) spin(el);
+  }
+
+  // ---------- carte du parcours ----------
+  const TRACK = "#1e7b3c", TRACK_GLOW = "#c9ffd9";   // couleur du tracé (vert foncé)
+  let mapObj = null;
+
+  // petit générateur de hasard qui donne toujours le même plan pour la même sortie
+  function rng(seed){ let x = seed % 2147483647 || 7; return () => (x = x*48271 % 2147483647) / 2147483647; }
+  const STREETS = ["Avenue des Champions","Rue du Sprint","Chemin des Mollets","Boulevard du Vélo","Rue de la Foulée","Avenue du Maillot","Rue des Baskets","Allée du Dossard","Rue du Pédalier","Avenue de l'Arrivée","Rue du Chrono","Place du Podium"];
+
+  // dessine un faux plan de quartier (rues, parc, lac) autour du tracé
+  function fakePlan(track, id){
+    const la = track.map(p=>p[0]), lo = track.map(p=>p[1]);
+    let a0 = Math.min(...la), a1 = Math.max(...la), o0 = Math.min(...lo), o1 = Math.max(...lo);
+    const pa = (a1-a0)*0.9+0.004, po = (o1-o0)*0.9+0.006;
+    a0-=pa; a1+=pa; o0-=po; o1+=po;
+    const k = Math.cos((a0+a1)/2*Math.PI/180), S = 111200;
+    const X = lon => (lon-o0)*k*S, Y = lat => (a1-lat)*S;
+    const W = X(o1), H = Y(a0), R = rng(id*7919+13);
+    let g = `<rect width="${W}" height="${H}" fill="#0c1636"/>`;
+    // pâtés de maisons
+    const step = Math.max(W,H)/26, u = step/130, ang = (R()*30-15);
+    g += `<g transform="rotate(${ang.toFixed(1)} ${W/2} ${H/2})">`;
+    const ext = Math.max(W,H)*0.75, cx = W/2, cy = H/2;
+    for (let x=cx-ext; x<cx+ext; x+=step) for (let y=cy-ext; y<cy+ext; y+=step)
+      if (R()>0.08) g += `<rect x="${(x+9*u).toFixed(0)}" y="${(y+9*u).toFixed(0)}" width="${step-18*u}" height="${step-18*u}" rx="${6*u}" fill="#121f47"/>`;
+    // grandes avenues avec leur nom
+    let n = 0; const names = [...STREETS].sort(()=>R()-0.5);
+    for (let i=-ext; i<ext; i+=step*4){
+      const nm = names[n++ % names.length], nm2 = names[n++ % names.length];
+      g += `<line x1="${cx-ext}" y1="${cy+i}" x2="${cx+ext}" y2="${cy+i}" stroke="#2a3f80" stroke-width="${16*u}"/>`;
+      g += `<line x1="${cx+i}" y1="${cy-ext}" x2="${cx+i}" y2="${cy+ext}" stroke="#2a3f80" stroke-width="${16*u}"/>`;
+      g += `<text x="${cx+i*0.3}" y="${cy+i-22*u}" fill="#8ea3d8" font-size="${62*u}" font-family="Nunito,sans-serif" text-anchor="middle">${nm}</text>`;
+      g += `<text x="${cx+i+22*u}" y="${cy+i*0.3}" fill="#8ea3d8" font-size="${62*u}" font-family="Nunito,sans-serif" transform="rotate(90 ${cx+i+22*u} ${cy+i*0.3})" text-anchor="middle">${nm2}</text>`;
+    }
+    g += `</g>`;
+    // le parc autour du parcours
+    const mx = (Math.min(...lo)+Math.max(...lo))/2, my = (Math.min(...la)+Math.max(...la))/2;
+    const rx = (Math.max(...lo)-Math.min(...lo))*k*S*0.18, ry = (Math.max(...la)-Math.min(...la))*S*0.16;
+    const park = track.map(([a,b])=>{ const px = X(mx + (b-mx)*1.35), py = Y(my + (a-my)*1.35); return px.toFixed(0)+","+py.toFixed(0); }).join(" ");
+    g += `<polygon points="${park}" fill="#17275a" stroke="#22397a" stroke-width="${10*u}" stroke-linejoin="round"/>`;
+    g += `<text x="${X(mx)}" y="${Y(my)+ry+110*u}" fill="#8ea8e8" font-size="${70*u}" font-family="Nunito,sans-serif" text-anchor="middle">Parc des Coureurs</text>`;
+    // un lac au milieu
+    g += `<ellipse cx="${X(mx)}" cy="${Y(my)}" rx="${rx}" ry="${ry}" fill="#123a6e" stroke="#1d5299" stroke-width="${6*u}"/>`;
+    g += `<text x="${X(mx)}" y="${Y(my)+20*u}" fill="#8fc0ff" font-size="${56*u}" font-style="italic" font-family="Nunito,sans-serif" text-anchor="middle">Lac Bleu</text>`;
+    return { svg: g, W, H, bounds: [[a0,o0],[a1,o1]], X, Y };
+  }
+
+  function drawMap(box, track, color, isDemo, id){
+    if (mapObj){ try{ mapObj.remove(); }catch(e){} mapObj = null; }
+    const plan = isDemo ? fakePlan(track, id) : null;
+    if (window.L && L.map){
+      try{
+        mapObj = L.map(box, { zoomControl:true, attributionControl:true, scrollWheelZoom:false });
+        mapObj.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+        if (plan){
+          const el = document.createElementNS("http://www.w3.org/2000/svg","svg");
+          el.setAttribute("viewBox", `0 0 ${plan.W} ${plan.H}`); el.setAttribute("preserveAspectRatio","none");
+          el.innerHTML = plan.svg;
+          L.svgOverlay(el, plan.bounds).addTo(mapObj);
+          mapObj.attributionControl.addAttribution("Plan inventé pour l'exemple");
+        } else {
+          L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+            maxZoom:19, subdomains:"abcd",
+            attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>'
+          }).addTo(mapObj);
+        }
+        L.polyline(track, { color:TRACK_GLOW, weight:9, opacity:.95 }).addTo(mapObj);
+        const line = L.polyline(track, { color:TRACK, weight:5, opacity:1, lineJoin:"round", smoothFactor:0.5 }).addTo(mapObj);
+        const pin = c => L.divIcon({ className:"", html:`<div class="pin ${c}"></div>`, iconSize:[16,16], iconAnchor:[8,8] });
+        L.marker(track[track.length-1], { icon:pin("end") }).addTo(mapObj);
+        L.marker(track[0], { icon:pin("go"), zIndexOffset:1000 }).addTo(mapObj);
+        mapObj.fitBounds(line.getBounds(), { padding:[24,24] });
+        return;
+      }catch(e){ mapObj = null; }
+    }
+    // sans internet : on dessine juste le tracé (et le faux plan pour les exemples)
+    const la = track.map(p=>p[0]), lo = track.map(p=>p[1]);
+    const k = Math.cos((Math.min(...la)+Math.max(...la))/2*Math.PI/180);
+    const x0 = Math.min(...lo), x1 = Math.max(...lo), y0 = Math.min(...la), y1 = Math.max(...la);
+    const W = 400, H = 260, pad = 24, sc = Math.min((W-2*pad)/(((x1-x0)*k)||1e-6), (H-2*pad)/((y1-y0)||1e-6));
+    const ox = (W-(x1-x0)*k*sc)/2, oy = (H-(y1-y0)*sc)/2;
+    const P = ([a,b]) => [ox+(b-x0)*k*sc, H-oy-(a-y0)*sc];
+    let bg = "";
+    if (plan){
+      const [px,py] = P([plan.bounds[1][0], plan.bounds[0][1]]), [qx,qy] = P([plan.bounds[0][0], plan.bounds[1][1]]);
+      bg = `<svg x="${px}" y="${py}" width="${qx-px}" height="${qy-py}" viewBox="0 0 ${plan.W} ${plan.H}" preserveAspectRatio="none">${plan.svg}</svg>`;
+    }
+    const d = track.map((p,i)=>{ const [x,y]=P(p); return (i?"L":"M")+x.toFixed(1)+" "+y.toFixed(1); }).join(" ");
+    const [sx,sy] = P(track[0]), [ex,ey] = P(track[track.length-1]);
+    box.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${bg}<path d="${d}" fill="none" stroke="${TRACK_GLOW}" stroke-opacity=".95" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${TRACK}" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${ex}" cy="${ey}" r="7" fill="#00e5ff" stroke="#fff" stroke-width="3"/><circle cx="${sx}" cy="${sy}" r="7" fill="#1f8bff" stroke="#fff" stroke-width="3"/></svg>`;
+  }
+})();
+</script>
+</body>
+</html>
