@@ -29,6 +29,20 @@
   }
   :root.mauve{--bg:#13061f; --card:#200b38; --card2:#2d114f; --line:#45207a; --glow:#5a1a8a66; --nav:#170828eb}
   [hidden]{display:none!important}
+  /* tutoriel */
+  .tutobtn{margin-top:22px}
+  #tuto{position:fixed;inset:0;z-index:4000;background:rgba(3,7,20,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:calc(16px + env(safe-area-inset-top)) 16px calc(16px + env(safe-area-inset-bottom))}
+  #tuto .box{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:26px 22px 20px;box-shadow:0 0 30px rgba(0,229,255,.25);position:relative;animation:fade .25s ease}
+  #tuto .num{font:700 13px Nunito,sans-serif;color:#00e5ff;letter-spacing:.5px}
+  #tuto .big-e{font-size:54px;line-height:1;margin:10px 0 6px}
+  #tuto h2{margin:6px 0 10px;font-size:24px}
+  #tuto ol{margin:0;padding-left:22px;line-height:1.55;font-size:15.5px}
+  #tuto ol li{margin-bottom:6px} #tuto b{color:#8be9ff}
+  #tuto p{margin:0;line-height:1.55;font-size:15.5px}
+  #tuto .dots{display:flex;justify-content:center;gap:7px;margin:20px 0 14px}
+  #tuto .dots i{width:8px;height:8px;border-radius:50%;background:var(--line)} #tuto .dots i.on{background:#00e5ff;box-shadow:0 0 8px #00e5ff}
+  #tuto .nav2{display:flex;gap:10px} #tuto .nav2 .btn{flex:1}
+  #tutoX{position:absolute;top:10px;right:14px;border:0;background:none;color:#cfe8ff;font:700 26px/1 Fredoka,sans-serif;cursor:pointer;text-shadow:0 0 6px #00e5ff,0 0 14px #2f7bff;padding:6px}
   .card.one > :first-child{margin-top:0}
   svg.flg{display:inline-block!important;height:1.35em!important;flex:none;vertical-align:-.22em;margin-right:4px;filter:drop-shadow(0 0 3px rgba(0,229,255,.45))}
   .flg.m{filter:drop-shadow(0 0 3px rgba(190,110,255,.55))}
@@ -52,6 +66,18 @@
 
   /* Accueil */
   .hero{margin:6px 0 44px}
+  .acct{margin:-28px 0 22px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 14px;font:600 15px Nunito,sans-serif;color:var(--txt)}
+  .acct .row{display:flex;align-items:center;gap:10px;justify-content:space-between}
+  .acct .who{display:flex;align-items:center;gap:6px;min-width:0;flex-wrap:wrap}
+  .acct p{margin:0 0 10px;color:var(--muted)}
+  .acct button{border:0;border-radius:14px;padding:11px 14px;font:700 15px Fredoka,Nunito,sans-serif;cursor:pointer}
+  .acct .g{width:100%;background:#fff;color:#0b1533;display:flex;align-items:center;justify-content:center;gap:10px}
+  .acct .lnk{background:none;color:var(--muted);padding:8px 4px;text-decoration:underline;font-weight:600}
+  .acct .out{background:var(--card2);color:var(--muted);padding:8px 12px;font-size:13px;flex:none}
+  .acct input{width:100%;box-sizing:border-box;margin:0 0 8px;padding:11px 12px;border-radius:12px;border:2px solid var(--line);background:var(--card2);color:var(--txt);font:600 16px Nunito,sans-serif}
+  .acct .two{display:flex;gap:8px}.acct .two button{flex:1;background:var(--blue);color:#fff}
+  .acct .two button.alt{background:var(--card2);color:var(--txt)}
+  .acct .err{color:#ff9db0;margin:8px 0 0;font-size:14px}
   .bigbtn{display:flex;align-items:center;gap:16px;width:100%;border:2px solid var(--line);background:var(--card);color:var(--txt);border-radius:22px;padding:22px 20px;font:800 24px Fredoka,Nunito,sans-serif;cursor:pointer;text-align:left;transition:transform .1s,border-color .2s,box-shadow .2s}
   .bigbtn:active{transform:scale(.98)}
   .bigbtn .e{width:76px;display:flex;justify-content:center;flex:none}
@@ -144,6 +170,12 @@
   .tab.on .e{filter:none;opacity:1}
   .map{height:260px;border-radius:14px;overflow:hidden;background:#071233;border:1px solid var(--line)}
   .map > svg{width:100%;height:100%;display:block}
+  .mapwrap{position:relative;z-index:0}
+  .mapbig{position:absolute;top:10px;right:10px;z-index:500;width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:rgba(8,16,42,.85);color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 0 12px rgba(0,229,255,.35)}
+  :root.mauve .mapbig{background:rgba(23,8,40,.85);box-shadow:0 0 12px rgba(190,110,255,.45)}
+  #mapFull{position:fixed;inset:0;z-index:3000;background:var(--bg);padding:calc(10px + env(safe-area-inset-top)) 10px calc(10px + env(safe-area-inset-bottom))}
+  #mapFull .map{height:100%;border-radius:16px}
+  #mapClose{position:absolute;top:calc(14px + env(safe-area-inset-top));right:16px;z-index:600;width:48px;height:48px;border:0;background:none;padding:0;color:#f4dcff;font:700 34px/1 Fredoka,Nunito,sans-serif;cursor:pointer;text-shadow:0 0 4px #fff,0 0 10px #d18cff,0 0 20px #b44dff,0 0 34px #9d4dff}
   .leaflet-container{background:#071233;font-family:Nunito,sans-serif}
   /* plan des rues aux couleurs de l'appli : rues claires sur fond bleu nuit */
   .leaflet-tile-pane{filter:invert(1) hue-rotate(200deg) saturate(.55) brightness(.95) contrast(1.1)}
@@ -198,6 +230,8 @@
 <path d="M7 31.8 L7.5 36.5" stroke="#00e5ff" stroke-width="3"/>
 </g></svg></span></h1>
     </div>
+    <div class="acct" id="acct"></div>
+
 
     <button class="bigbtn run" data-s="run"><span class="e"><svg class="big-ico" viewBox="0 0 64 64" aria-label="Coureur">
 <defs>
@@ -297,6 +331,8 @@
 </svg>
 </span><span>Vélo</span></button>
 
+    <button class="btn ghost tutobtn" id="tutoBtn">📖 Un p'tit tuto ?</button>
+
     <div class="panel" id="panel" hidden>
       <!-- étape 1 : importer -->
       <div id="step-import">
@@ -332,6 +368,8 @@
   <section class="view" id="v-bike"></section>
 </div>
 
+<div id="tuto" hidden><div class="box"><button id="tutoX" aria-label="Fermer le tutoriel">✕</button><div id="tutoBody"></div><div class="dots" id="tutoDots"></div><div class="nav2"><button class="btn ghost" id="tutoPrev">‹ Retour</button><button class="btn" id="tutoNext">Suivant ›</button></div></div></div>
+<div id="mapFull" hidden><div class="map" id="bigBox"></div><button id="mapClose" aria-label="Fermer le grand plan">✕</button></div>
 <nav><div class="in">
   <button class="tab on" data-v="home"><span class="e"><svg class="nico" viewBox="0 0 48 48" aria-label="Maison"><g stroke-linecap="round" stroke-linejoin="round">
 <path d="M32 13 L32 7.5 L37 7.5 L37 17" fill="#11204a" stroke="#00e5ff" stroke-width="2.2"/>
@@ -386,7 +424,17 @@
   const LS = "sport-stats-leon";
   let sessions = [];
   try { sessions = JSON.parse(localStorage.getItem(LS)) || []; } catch(e){ sessions = []; }
-  const save = () => { try { localStorage.setItem(LS, JSON.stringify(sessions)); } catch(e){} };
+  const save = () => { try { localStorage.setItem(LS, JSON.stringify(sessions)); } catch(e){} if (window.upsCloud) window.upsCloud(sessions); };
+  // ---------- lien avec la sauvegarde en ligne (Firebase) ----------
+  window.ups = {
+    get: () => sessions,
+    set: list => {
+      sessions = list;
+      try { localStorage.setItem(LS, JSON.stringify(sessions)); } catch(e){}
+      const v = document.querySelector(".view.on");
+      if (v && v.id !== "v-home") renderStats(v.id.slice(2));
+    }
+  };
 
   // ---------- on enlève les fausses stats d'exemple ----------
   // ---------- fausses stats d'exemple (ajoutées une seule fois) ----------
@@ -415,6 +463,8 @@
       localStorage.setItem(DEMO_KEY, "1"); save();
     }
   } catch(e){}
+  // on enlève la fausse course de test du plan
+  if (sessions.some(x=>x.id===2001 && x.demo)) { sessions = sessions.filter(x=>!(x.id===2001 && x.demo)); save(); }
 
   // ---------- outils ----------
   const fmtKm = n => (Math.round(n*10)/10).toLocaleString("fr-BE");
@@ -685,7 +735,7 @@
       <div class="kpis">${kpis.map(([l,v,l2,v2])=>`<div class="card kpi ${one?"one":""}"><div class="lab">${l}</div><div class="big">${roll(v)}</div>${l2?`<div class="lab" style="margin-top:10px">${l2}</div><div class="big">${roll(v2)}</div>`:""}</div>`).join("")}</div>
       <div class="stack" style="margin-top:14px">
         ${one ? `<div class="card"><h3>Mon parcours 🗺️</h3>${one.track && one.track.length>1
-            ? `<div class="map"></div><div class="maplegend"><span><i style="background:#1f8bff"></i>Départ</span><span><i style="background:#00e5ff"></i>Arrivée</span></div>`
+            ? `<div class="mapwrap"><div class="map"></div><button class="mapbig" id="mapBig" aria-label="Agrandir le plan"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button></div><div class="maplegend"><span><i style="background:#1f8bff"></i>Départ</span><span><i style="background:#00e5ff"></i>Arrivée</span></div>`
             : `<div class="nomap">Pas de carte pour cette ${isRun?"course":"sortie"} : elle n'a pas été importée avec un fichier GPX. Les prochaines que tu importes auront leur carte ! 📂</div>`}</div>`
           : ""}
         ${one ? `<div class="card one">${extra}</div>` : `<div class="card"><h3>${recTitle}</h3><div class="records">${recs.map(([l,v])=>`<div class="rec"><div class="lab">${l}</div><div class="v">${roll(v)}</div></div>`).join("")}</div></div>`}
@@ -707,13 +757,49 @@
       if (!sureDel){ sureDel = true; $("delBtn").textContent = "Appuie encore pour confirmer"; $("delBtn").classList.add("danger"); return; }
       sessions = sessions.filter(x=>x.id!==one.id); save(); focus[sp] = null; sureDel = false; renderStats(sp, true);
     });
-    if (one && one.track && one.track.length>1) drawMap(el.querySelector(".map"), one.track, color, !!one.demo, one.id);
+    if (one && one.track && one.track.length>1){
+      drawMap(el.querySelector(".map"), one.track, color, !!one.demo, one.id);
+      $("mapBig").addEventListener("click", ()=>{
+        $("mapFull").hidden = false; document.body.style.overflow = "hidden";
+        drawMap($("bigBox"), one.track, color, !!one.demo, one.id, true);
+      });
+    }
     if (animate) spin(el);
   }
 
+  // ---------- tutoriel ----------
+  const TUTO = [
+    ["👋","Bienvenue dans Une petite course !",`<p>Ici, tu ranges toutes tes <b>courses à pied</b> et tes <b>sorties vélo</b>. L'appli calcule ta distance, ton temps, ta vitesse, et te montre ton parcours sur un plan.</p><p style="margin-top:10px">On va voir ensemble comment ça marche, en 4 étapes 🚀</p>`],
+    ["📍","1. Enregistre ta sortie",`<ol><li>Avant de partir, ouvre l'appli <b>Open GPX Tracker</b>.</li><li>Appuie sur <b>Start tracking</b> (démarrer), puis va courir ou rouler 🏃🚴</li><li>À l'arrivée, appuie sur <b>Save</b> (enregistrer) et donne un nom à ta sortie.</li></ol>`],
+    ["📤","2. Range le fichier dans ton iPhone",`<ol><li>Dans Open GPX Tracker, ouvre la <b>liste de tes fichiers</b> (l'icône du dossier).</li><li>Appuie sur ta sortie, puis sur <b>Partager</b>.</li><li>Choisis <b>Enregistrer dans Fichiers</b>.</li></ol>`],
+    ["📂","3. Importe-la ici",`<ol><li>Dans l'onglet <b>Accueil</b>, appuie sur <b>Course à pied</b> ou <b>Vélo</b>.</li><li>Appuie sur <b>Importer ma sortie</b> et choisis ton fichier.</li><li>Ajoute un petit <b>commentaire</b> si tu veux, puis appuie sur <b>Enregistrer</b> ✓</li></ol>`],
+    ["🏆","4. Regarde tes stats !",`<ol><li>Va dans <b>Stats course</b> ou <b>Stats vélo</b> : tes km, tes records et tes badges 🏅</li><li>Appuie sur une sortie pour voir ses stats et son <b>parcours</b> sur le plan.</li><li>Appuie sur le <b>bouton en haut à droite du plan</b> pour l\'agrandir, bouger et zoomer.</li></ol>`]
+  ];
+  let tutoI = 0;
+  function tutoShow(i){
+    tutoI = i; const [e,t,b] = TUTO[i];
+    $("tutoBody").innerHTML = `<div class="num">${i? "ÉTAPE "+i+" SUR "+(TUTO.length-1) : "TUTORIEL"}</div><div class="big-e">${e}</div><h2>${t}</h2>${b}`;
+    $("tutoDots").innerHTML = TUTO.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("");
+    $("tutoPrev").style.visibility = i ? "visible" : "hidden";
+    $("tutoNext").textContent = i===TUTO.length-1 ? "C'est parti ! 🚀" : "Suivant ›";
+  }
+  function tutoOpen(){ $("tuto").hidden = false; document.body.style.overflow = "hidden"; tutoShow(0); }
+  function tutoClose(){ $("tuto").hidden = true; document.body.style.overflow = ""; try{ localStorage.setItem("sport-stats-leon-tuto","1"); }catch(e){} }
+  $("tutoBtn").addEventListener("click", tutoOpen);
+  $("tutoX").addEventListener("click", tutoClose);
+  $("tutoPrev").addEventListener("click", ()=>{ if (tutoI) tutoShow(tutoI-1); });
+  $("tutoNext").addEventListener("click", ()=>{ tutoI < TUTO.length-1 ? tutoShow(tutoI+1) : tutoClose(); });
+  // la toute première fois, le tutoriel s'ouvre tout seul
+  try{ if (!localStorage.getItem("sport-stats-leon-tuto")) tutoOpen(); }catch(e){}
+
   // ---------- carte du parcours ----------
+  document.getElementById("mapClose").addEventListener("click", ()=>{
+    if (bigMap){ try{ bigMap.remove(); }catch(e){} bigMap = null; }
+    document.getElementById("bigBox").innerHTML = "";
+    document.getElementById("mapFull").hidden = true; document.body.style.overflow = "";
+  });
   const TRACK = "#1e7b3c", TRACK_GLOW = "#c9ffd9";   // couleur du tracé (vert foncé)
-  let mapObj = null;
+  let mapObj = null, bigMap = null;
 
   // petit générateur de hasard qui donne toujours le même plan pour la même sortie
   function rng(seed){ let x = seed % 2147483647 || 7; return () => (x = x*48271 % 2147483647) / 2147483647; }
@@ -757,41 +843,48 @@
     return { svg: g, W, H, bounds: [[a0,o0],[a1,o1]], X, Y };
   }
 
-  function drawMap(box, track, color, isDemo, id){
-    if (mapObj){ try{ mapObj.remove(); }catch(e){} mapObj = null; }
+  function drawMap(box, track, color, isDemo, id, free){
+    if (free){ if (bigMap){ try{ bigMap.remove(); }catch(e){} bigMap = null; } }
+    else if (mapObj){ try{ m.remove(); }catch(e){} mapObj = null; }
+    let m = null;
     const plan = isDemo ? fakePlan(track, id) : null;
     if (window.L && L.map){
       try{
         box.innerHTML = "";
-        mapObj = L.map(box, { zoomControl:true, attributionControl:true, scrollWheelZoom:false });
-        mapObj.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
+        // petite carte : figée (ni bouger, ni zoomer) ; grande carte : libre
+        m = L.map(box, free
+          ? { zoomControl:false, attributionControl:true }
+          : { zoomControl:false, attributionControl:true, dragging:false, touchZoom:false, doubleClickZoom:false, scrollWheelZoom:false, boxZoom:false, keyboard:false, tap:false });
+        if (free) bigMap = m; else mapObj = m;
+        m.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
         if (plan){
           const el = document.createElementNS("http://www.w3.org/2000/svg","svg");
           el.setAttribute("viewBox", `0 0 ${plan.W} ${plan.H}`); el.setAttribute("preserveAspectRatio","none");
           el.innerHTML = plan.svg;
-          L.svgOverlay(el, plan.bounds).addTo(mapObj);
-          mapObj.attributionControl.addAttribution("Plan inventé pour l'exemple");
+          L.svgOverlay(el, plan.bounds).addTo(m);
+          m.attributionControl.addAttribution("Plan inventé pour l'exemple");
         } else {
           // plan des rues OpenStreetMap (gratuit, sans clé)
           L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
             maxZoom:19, attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          }).addTo(mapObj);
+          }).addTo(m);
         }
-        L.polyline(track, { color:TRACK_GLOW, weight:9, opacity:.95 }).addTo(mapObj);
-        const line = L.polyline(track, { color:TRACK, weight:5, opacity:1, lineJoin:"round", smoothFactor:0.5 }).addTo(mapObj);
+        L.polyline(track, { color:TRACK_GLOW, weight:9, opacity:.95 }).addTo(m);
+        const line = L.polyline(track, { color:TRACK, weight:5, opacity:1, lineJoin:"round", smoothFactor:0.5 }).addTo(m);
         const pin = c => L.divIcon({ className:"", html:`<div class="pin ${c}"></div>`, iconSize:[16,16], iconAnchor:[8,8] });
-        L.marker(track[track.length-1], { icon:pin("end") }).addTo(mapObj);
-        L.marker(track[0], { icon:pin("go"), zIndexOffset:1000 }).addTo(mapObj);
-        mapObj.fitBounds(line.getBounds(), { padding:[24,24] });
+        L.marker(track[track.length-1], { icon:pin("end") }).addTo(m);
+        L.marker(track[0], { icon:pin("go"), zIndexOffset:1000 }).addTo(m);
+        m.fitBounds(line.getBounds(), { padding: free ? [40,40] : [24,24] });
+        if (free) setTimeout(()=>{ if (bigMap===m){ m.invalidateSize(); m.fitBounds(line.getBounds(), { padding:[40,40] }); } }, 60);
         return;
-      }catch(e){ mapObj = null; }
+      }catch(e){ if (free) bigMap = null; else mapObj = null; }
     }
     // Leaflet n'a pas chargé : on essaie une 2e adresse, puis on redessine la carte
     if (!window.L && !drawMap.retry){
       drawMap.retry = true;
       const css = document.createElement("link"); css.rel="stylesheet"; css.href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"; document.head.appendChild(css);
       const js = document.createElement("script"); js.src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js";
-      js.onload = ()=>{ if (document.body.contains(box)) drawMap(box, track, color, isDemo, id); };
+      js.onload = ()=>{ if (document.body.contains(box)) drawMap(box, track, color, isDemo, id, free); };
       document.head.appendChild(js);
     }
     // sans internet : on dessine juste le tracé (et le faux plan pour les exemples)
@@ -811,6 +904,116 @@
     box.innerHTML = `<svg viewBox="0 0 ${W} ${H}">${bg}<path d="${d}" fill="none" stroke="${TRACK_GLOW}" stroke-opacity=".95" stroke-width="8" stroke-linejoin="round" stroke-linecap="round"/><path d="${d}" fill="none" stroke="${TRACK}" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"/><circle cx="${ex}" cy="${ey}" r="7" fill="#00e5ff" stroke="#fff" stroke-width="3"/><circle cx="${sx}" cy="${sy}" r="7" fill="#1f8bff" stroke="#fff" stroke-width="3"/></svg>`;
   }
 })();
+</script>
+<script type="module">
+// ---------- sauvegarde en ligne : connexion + sorties rangées dans ton compte Firebase ----------
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
+import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
+import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+
+const app = initializeApp({
+  apiKey: "AIzaSyCBMN5E4cFnygv2bXCNvV3aVMZzV91wq7g",
+  authDomain: "p-tite-course.firebaseapp.com",
+  projectId: "p-tite-course",
+  storageBucket: "p-tite-course.firebasestorage.app",
+  messagingSenderId: "123940339674",
+  appId: "1:123940339674:web:dfad03533a7db9e1b90ae3"
+});
+const auth = getAuth(app), db = getFirestore(app);
+const box = document.getElementById("acct");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const ERR = {
+  "auth/popup-blocked": "La fenêtre Google a été bloquée. Réessaie, ou connecte-toi avec un e-mail.",
+  "auth/popup-closed-by-user": "Tu as fermé la fenêtre avant la fin 😉",
+  "auth/cancelled-popup-request": "Tu as fermé la fenêtre avant la fin 😉",
+  "auth/operation-not-allowed": "Cette façon de se connecter n'est pas encore activée dans Firebase.",
+  "auth/unauthorized-domain": "Le site n'est pas encore autorisé dans Firebase (Domaines autorisés).",
+  "auth/invalid-credential": "E-mail ou mot de passe incorrect.",
+  "auth/wrong-password": "Mot de passe incorrect.",
+  "auth/user-not-found": "Pas de compte avec cet e-mail. Appuie sur « Créer un compte ».",
+  "auth/email-already-in-use": "Ce compte existe déjà : appuie sur « Se connecter ».",
+  "auth/weak-password": "Mot de passe trop court (6 caractères minimum).",
+  "auth/invalid-email": "Cet e-mail n'a pas l'air correct.",
+  "auth/network-request-failed": "Pas d'internet ? Réessaie dans un instant.",
+  "permission-denied": "Firebase refuse l'accès : vérifie les règles de la base de données.",
+  "not-found": "La base de données n'est pas encore créée dans Firebase."
+};
+const say = e => ERR[e && e.code] || "Oups, ça n'a pas marché 😕" + (e && e.code ? " (" + e.code + ")" : "");
+
+// ----- synchronisation -----
+let user = null, ready = false, cloudIds = new Set(), queue = Promise.resolve(), lastErr = "";
+const col = () => collection(db, "users", user.uid, "sessions");
+const pack = s => { const o = { ...s }; if (o.track) o.track = JSON.stringify(o.track); else delete o.track; return o; };
+const unpack = d => { const s = { ...d }; if (typeof s.track === "string") { try { s.track = JSON.parse(s.track); } catch(e){ delete s.track; } } else delete s.track; return s; };
+
+async function push(list){
+  const mine = list.filter(s => !s.demo);           // les fausses stats d'exemple restent dans le téléphone
+  const ids = new Set(mine.map(s => String(s.id)));
+  for (const s of mine) if (!cloudIds.has(String(s.id))) { await setDoc(doc(col(), String(s.id)), pack(s)); cloudIds.add(String(s.id)); }
+  for (const id of [...cloudIds]) if (!ids.has(id)) { await deleteDoc(doc(col(), id)); cloudIds.delete(id); }
+}
+window.upsCloud = list => {
+  if (!user || !ready) return;
+  queue = queue.then(() => push(list)).then(() => { lastErr = ""; draw(); }).catch(e => { lastErr = say(e); draw(); });
+};
+
+async function loadCloud(){
+  ready = false; lastErr = ""; draw();
+  try {
+    const snap = await getDocs(col());
+    cloudIds = new Set(snap.docs.map(d => d.id));
+    const byId = new Map();
+    window.ups.get().forEach(s => byId.set(String(s.id), s));       // ce qu'il y a déjà dans ce téléphone
+    snap.docs.forEach(d => byId.set(d.id, unpack(d.data())));        // + ce qu'il y a dans ton compte
+    const merged = [...byId.values()].sort((a, b) => a.id - b.id);
+    ready = true;
+    window.ups.set(merged);
+    await push(merged);                                              // envoie les sorties qui n'étaient que dans le téléphone
+    setDoc(doc(db, "users", user.uid), { nom: user.displayName || (user.email || "").split("@")[0], vu: new Date().toISOString() }, { merge: true }).catch(()=>{});
+  } catch(e){ lastErr = say(e); }
+  draw();
+}
+
+// ----- affichage -----
+let mode = "start", formErr = "";
+function draw(){
+  if (user){
+    const name = user.displayName ? user.displayName.split(" ")[0] : (user.email || "");
+    const state = lastErr ? `<span class="err" style="margin:0">⚠️ ${esc(lastErr)}</span>` : ready ? `☁️ <b>${esc(name)}</b>, tes sorties sont sauvegardées` : `☁️ Je récupère tes sorties…`;
+    box.innerHTML = `<div class="row"><div class="who">${state}</div><button class="out" id="aOut">Se déconnecter</button></div>`;
+    document.getElementById("aOut").onclick = () => signOut(auth);
+    return;
+  }
+  if (mode === "mail"){
+    box.innerHTML = `<p>Connexion avec un e-mail</p>
+      <input id="aMail" type="email" autocomplete="email" placeholder="ton e-mail">
+      <input id="aPwd" type="password" autocomplete="current-password" placeholder="mot de passe (6 caractères min.)">
+      <div class="two"><button id="aIn">Se connecter</button><button class="alt" id="aNew">Créer un compte</button></div>
+      <button class="lnk" id="aForgot">Mot de passe oublié ?</button> <button class="lnk" id="aBack">Retour</button>
+      ${formErr ? `<p class="err">${esc(formErr)}</p>` : ""}`;
+    const v = () => [document.getElementById("aMail").value.trim(), document.getElementById("aPwd").value];
+    const go = f => async () => { const [m, p] = v(); formErr = ""; try { await f(auth, m, p); } catch(e){ formErr = say(e); draw(); document.getElementById("aMail").value = m; } };
+    document.getElementById("aIn").onclick = go(signInWithEmailAndPassword);
+    document.getElementById("aNew").onclick = go(createUserWithEmailAndPassword);
+    document.getElementById("aForgot").onclick = async () => { const [m] = v(); if (!m){ formErr = "Écris d'abord ton e-mail."; draw(); return; }
+      try { await sendPasswordResetEmail(auth, m); formErr = "C'est envoyé ! Regarde tes e-mails 📬"; } catch(e){ formErr = say(e); } draw(); document.getElementById("aMail").value = m; };
+    document.getElementById("aBack").onclick = () => { mode = "start"; formErr = ""; draw(); };
+    return;
+  }
+  box.innerHTML = `<p>☁️ Connecte-toi pour ne jamais perdre tes sorties, même si tu changes de téléphone.</p>
+    <button class="g" id="aG"><svg width="20" height="20" viewBox="0 0 48 48" aria-hidden="true"><path fill="#4285F4" d="M45 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h11.8c-.5 2.7-2.1 5-4.4 6.6v5.5h7.1C42.6 36.8 45 31.2 45 24.5z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.4l-7.1-5.5c-2 1.3-4.5 2.1-7.4 2.1-5.7 0-10.5-3.8-12.2-9H4.5v5.7C8.1 41.1 15.5 46 24 46z"/><path fill="#FBBC05" d="M11.8 28.2c-.4-1.3-.7-2.7-.7-4.2s.3-2.9.7-4.2v-5.7H4.5C3 17.1 2 20.4 2 24s1 6.9 2.5 9.9l7.3-5.7z"/><path fill="#EA4335" d="M24 10.8c3.2 0 6.1 1.1 8.4 3.3l6.3-6.3C34.9 4.2 29.9 2 24 2 15.5 2 8.1 6.9 4.5 14.1l7.3 5.7c1.7-5.2 6.5-9 12.2-9z"/></svg>Se connecter avec Google</button>
+    <button class="lnk" id="aM">ou avec un e-mail</button>
+    ${formErr ? `<p class="err">${esc(formErr)}</p>` : ""}`;
+  document.getElementById("aG").onclick = async () => { formErr = ""; try { await signInWithPopup(auth, new GoogleAuthProvider()); } catch(e){ formErr = say(e); draw(); } };
+  document.getElementById("aM").onclick = () => { mode = "mail"; formErr = ""; draw(); };
+}
+
+box.innerHTML = `<p style="margin:0">☁️ …</p>`;
+onAuthStateChanged(auth, u => {
+  user = u; ready = false; cloudIds = new Set(); mode = "start"; formErr = "";
+  if (u) loadCloud(); else draw();
+});
 </script>
 </body>
 </html>
