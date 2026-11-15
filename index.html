@@ -79,19 +79,44 @@
   .acct .two button.alt{background:var(--card2);color:var(--txt)}
   .acct .err{color:#ff9db0;margin:8px 0 0;font-size:14px}
   .hero{position:relative}
-  .flagbox{position:relative;display:flex;justify-content:flex-end;margin:-4px 0 6px;z-index:20}
+  .flagbox{position:relative;display:flex;justify-content:flex-start;margin:-4px 0 6px;z-index:20}
   .flagbtn{background:none;border:0;padding:6px;margin:-6px;cursor:pointer;display:block;-webkit-tap-highlight-color:transparent}
   .flagbtn svg{width:44px;height:35px;display:block}
   .flagbtn.on svg{filter:drop-shadow(0 0 6px #00e5ff88)}
   .flagbtn.wait svg{opacity:.6}
   .flagbtn.bad svg{filter:drop-shadow(0 0 6px #ff4d6d)}
-  .flagbox .pop{position:absolute;right:0;top:44px;width:250px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 12px 30px #000a;font:600 15px Nunito,sans-serif;color:var(--txt)}
+  .flagbox .pop{position:absolute;left:0;top:44px;width:250px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 12px 30px #000a;font:600 15px Nunito,sans-serif;color:var(--txt)}
   .flagbox .pop p{margin:0 0 12px;line-height:1.35}
   .flagbox .pop .err{color:#ff9db0}
   .flagbox .two{display:flex;gap:8px}
   .flagbox .two button{flex:1;border:0;border-radius:14px;padding:11px 8px;font:700 14px Fredoka,Nunito,sans-serif;cursor:pointer}
   .flagbox .alt{background:var(--card2);color:var(--txt)}
   .flagbox .danger{background:#ff4d6d;color:#fff}
+  .atitle{margin:6px 0 14px;font-size:26px}
+  .acard{margin-bottom:14px}
+  .acard p{margin:0 0 12px;line-height:1.4}
+  .ain{width:100%;box-sizing:border-box;padding:13px 14px;border-radius:14px;border:2px solid var(--line);background:var(--card2);color:var(--txt);font:700 17px Nunito,sans-serif;margin:0 0 10px}
+  .addrow{display:flex;gap:8px}.addrow .ain{margin:0;text-transform:uppercase;letter-spacing:3px;text-align:center}.addrow .btn{width:auto;padding:13px 18px}
+  .lbl2{color:var(--muted);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:1px}
+  .mycode{font:700 38px Fredoka,Nunito,sans-serif;letter-spacing:8px;text-align:center;color:#00e5ff;text-shadow:0 0 14px #00e5ff88;margin:0 0 14px}
+  .amsg{margin:12px 0 0 !important;color:#9fe8ff;font-weight:700}
+  .hint{color:var(--muted);font-size:14px;text-align:center;margin:10px 0 0}
+  .seg{display:flex;gap:6px;background:var(--card2);border-radius:14px;padding:4px;margin-bottom:8px}
+  .seg button{flex:1;border:0;border-radius:11px;padding:10px 6px;background:none;color:var(--muted);font:700 15px Fredoka,Nunito,sans-serif;cursor:pointer}
+  .seg button.on{background:var(--blue);color:#fff;box-shadow:0 0 12px rgba(61,139,255,.5)}
+  .seg.sm button{font-size:13px;padding:7px 4px}
+  .alist{margin-top:6px}
+  .arow{display:flex;align-items:center;gap:10px;padding:11px 6px;border-bottom:1px solid var(--line)}
+  .arow:last-child{border-bottom:0}
+  .arow.me{background:rgba(61,139,255,.12);border-radius:12px}
+  .arow .am{width:30px;text-align:center;font-size:22px}
+  .arow .rk{font:700 16px Fredoka,Nunito,sans-serif;color:var(--muted)}
+  .arow .an{flex:1;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.arow .an i{color:var(--muted);font-style:normal;font-weight:600}
+  .arow .av{text-align:right;display:flex;flex-direction:column}.arow .av small{color:var(--muted);font-size:12px}
+  .frow{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line);font-weight:700}
+  .frow:last-child{border-bottom:0}
+  .frow .rm{border:1px solid var(--line);background:none;color:var(--muted);border-radius:10px;padding:7px 12px;font:600 13px Nunito,sans-serif;cursor:pointer}
+  .frow .rm.sure{border-color:#ff5d7a;color:#ff5d7a}
   .bigbtn{display:flex;align-items:center;gap:16px;width:100%;border:2px solid var(--line);background:var(--card);color:var(--txt);border-radius:22px;padding:22px 20px;font:800 24px Fredoka,Nunito,sans-serif;cursor:pointer;text-align:left;transition:transform .1s,border-color .2s,box-shadow .2s}
   .bigbtn:active{transform:scale(.98)}
   .bigbtn .e{width:76px;display:flex;justify-content:center;flex:none}
@@ -380,6 +405,7 @@
   <!-- STATS COURSE / VÉLO -->
   <section class="view" id="v-run"></section>
   <section class="view" id="v-bike"></section>
+  <section class="view" id="v-amis"></section>
 </div>
 
 <div id="tuto" hidden><div class="box"><button id="tutoX" aria-label="Fermer le tutoriel">✕</button><div id="tutoBody"></div><div class="dots" id="tutoDots"></div><div class="nav2"><button class="btn ghost" id="tutoPrev">‹ Retour</button><button class="btn" id="tutoNext">Suivant ›</button></div></div></div>
@@ -427,6 +453,15 @@
 <path d="M28.5 29 L27.5 34" stroke="#ffd2a8" stroke-width="2.6"/>
 <path d="M26 35.5 L30 35.5" stroke="#00e5ff" stroke-width="2.6"/>
 </g></svg></span>Stats vélo</button>
+  <button class="tab" data-v="amis"><span class="e"><svg class="nico" viewBox="0 0 48 48" aria-label="Podium"><g stroke-linecap="round" stroke-linejoin="round">
+<path d="M17 20 H31 V42 H17 Z" fill="#2f7bff" stroke="#2f7bff" stroke-width="2"/>
+<path d="M5 28 H17 V42 H5 Z" fill="#11204a" stroke="#00e5ff" stroke-width="2"/>
+<path d="M31 32 H43 V42 H31 Z" fill="#11204a" stroke="#00e5ff" stroke-width="2"/>
+<text x="24" y="35" font-size="11" font-weight="800" text-anchor="middle" fill="#eaf1ff" font-family="Fredoka,Nunito,sans-serif" stroke="none">1</text>
+<path d="M19 6 H29 V10 Q29 15 24 15 Q19 15 19 10 Z" fill="#ffd27a" stroke="#ffd27a" stroke-width="1.6"/>
+<path d="M24 15 V18 M21 18 H27" stroke="#ffd27a" stroke-width="2"/>
+<path d="M6 42 H42" stroke="#eaf1ff" stroke-width="2.2"/>
+</g></svg></span>Amis</button>
 </div></nav>
 
 <script>
@@ -511,7 +546,8 @@
     document.querySelectorAll(".view").forEach(x=>x.classList.toggle("on", x.id==="v-"+v));
     document.querySelectorAll(".tab").forEach(x=>x.classList.toggle("on", x.dataset.v===v));
     if (v==="home") document.documentElement.classList.remove("mauve");
-    if (v!=="home") renderStats(v);
+    if (v==="amis"){ document.documentElement.classList.remove("mauve"); if (window.renderAmis) window.renderAmis(); }
+    else if (v!=="home") renderStats(v);
     window.scrollTo(0,0);
   }
   document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click", ()=>{
@@ -923,7 +959,7 @@
 // ---------- sauvegarde en ligne : connexion + sorties rangées dans ton compte Firebase ----------
 import { initializeApp } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-app.js";
 import { getAuth, GoogleAuthProvider, signInWithPopup, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
+import { getFirestore, collection, getDocs, getDoc, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/13.3.0/firebase-firestore.js";
 
 const app = initializeApp({
   apiKey: "AIzaSyCBMN5E4cFnygv2bXCNvV3aVMZzV91wq7g",
@@ -969,7 +1005,7 @@ async function push(list){
 }
 window.upsCloud = list => {
   if (!user || !ready) return;
-  queue = queue.then(() => push(list)).then(() => { lastErr = ""; draw(); }).catch(e => { lastErr = say(e); draw(); });
+  queue = queue.then(() => push(list)).then(() => { lastErr = ""; draw(); if (window.upsAfterSync) window.upsAfterSync(); }).catch(e => { lastErr = say(e); draw(); });
 };
 
 async function loadCloud(){
@@ -987,6 +1023,7 @@ async function loadCloud(){
     setDoc(doc(db, "users", user.uid), { nom: user.displayName || (user.email || "").split("@")[0], vu: new Date().toISOString() }, { merge: true }).catch(()=>{});
   } catch(e){ lastErr = say(e); }
   draw();
+  loadProfile();
 }
 
 // ----- affichage -----
@@ -1052,10 +1089,176 @@ function draw(){
   document.getElementById("aM").onclick = () => { mode = "mail"; formErr = ""; draw(); };
 }
 
+// =====================================================================
+// ---------- AMIS : code ami, liste d'amis et classement ----------
+// profils/{uid}        : pseudo + code + résumé des stats (lisible par les connectés)
+// codes/{CODE}         : à qui appartient un code ami
+// users/{uid}/amis/{x} : la liste d'amis (chacun ajoute l'autre et soi-même chez l'autre)
+// =====================================================================
+const vA = document.getElementById("v-amis");
+let prof = null, profLoaded = false, friends = [], friendsLoaded = false, aMsg = "", aSport = "run", aPer = "mois", sureRm = null;
+const moisNow = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,7); };
+const km1 = n => (Math.round((n||0)*10)/10).toLocaleString("fr-BE");
+const pendingCode = (() => { try { const c = new URLSearchParams(location.search).get("ami"); if (c) sessionStorage.setItem("ups-ami", c.toUpperCase()); return sessionStorage.getItem("ups-ami"); } catch(e){ return null; } })();
+
+function resume(list){
+  const m = moisNow(), out = { mois: m };
+  for (const sp of ["run","bike"]){
+    const L = list.filter(s => !s.demo && s.sport === sp), LM = L.filter(s => String(s.date).slice(0,7) === m);
+    out[sp] = { km: +L.reduce((a,s)=>a+s.km,0).toFixed(2), n: L.length, best: +Math.max(0,...L.map(s=>s.km)).toFixed(2),
+                kmMois: +LM.reduce((a,s)=>a+s.km,0).toFixed(2), nMois: LM.length };
+  }
+  return out;
+}
+async function publish(){
+  if (!user || !prof || !prof.pseudo) return;
+  prof.stats = resume(window.ups.get());
+  await setDoc(doc(db, "profils", user.uid), { pseudo: prof.pseudo, code: prof.code, stats: prof.stats, maj: new Date().toISOString() });
+}
+window.upsAfterSync = () => publish().catch(()=>{});
+
+async function loadProfile(){
+  profLoaded = false; friendsLoaded = false; prof = null; friends = []; renderAmis();
+  try {
+    const p = await getDoc(doc(db, "profils", user.uid));
+    prof = p.exists() ? p.data() : null;
+    if (prof) publish().catch(()=>{});
+  } catch(e){ aMsg = say(e); }
+  profLoaded = true;
+  if (prof) { await loadFriends(); if (pendingCode) addFriend(pendingCode, true); }
+  renderAmis();
+}
+async function loadFriends(){
+  try {
+    const snap = await getDocs(collection(db, "users", user.uid, "amis"));
+    friends = await Promise.all(snap.docs.map(async d => {
+      try { const p = await getDoc(doc(db, "profils", d.id)); return { uid: d.id, ...(p.exists() ? p.data() : { pseudo: "???" }) }; }
+      catch(e){ return { uid: d.id, pseudo: "???" }; }
+    }));
+  } catch(e){ aMsg = say(e); }
+  friendsLoaded = true;
+}
+
+const ALPH = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+async function createProfile(pseudo){
+  for (let t = 0; t < 6; t++){
+    let code = ""; for (let i = 0; i < 6; i++) code += ALPH[Math.floor(Math.random()*ALPH.length)];
+    try {
+      const ex = await getDoc(doc(db, "codes", code));
+      if (ex.exists()) continue;
+      await setDoc(doc(db, "codes", code), { uid: user.uid });
+      prof = { pseudo, code };
+      await publish();
+      await loadFriends();
+      if (pendingCode) await addFriend(pendingCode, true);
+      return;
+    } catch(e){ if (t === 5) throw e; }
+  }
+}
+async function addFriend(raw, auto){
+  const code = String(raw||"").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (auto) try { sessionStorage.removeItem("ups-ami"); } catch(e){}
+  if (code.length !== 6){ aMsg = "Un code ami a 6 lettres et chiffres 😉"; renderAmis(); return; }
+  if (prof && code === prof.code){ aMsg = auto ? "" : "C'est ton propre code 😄"; renderAmis(); return; }
+  aMsg = "Je cherche ton ami…"; renderAmis();
+  try {
+    const c = await getDoc(doc(db, "codes", code));
+    if (!c.exists()){ aMsg = "Je ne trouve personne avec ce code 🤔"; renderAmis(); return; }
+    const uid = c.data().uid;
+    if (friends.some(f => f.uid === uid)){ aMsg = "Vous êtes déjà amis 🤝"; renderAmis(); return; }
+    const t = { depuis: new Date().toISOString() };
+    await setDoc(doc(db, "users", user.uid, "amis", uid), t);   // il arrive dans ta liste…
+    await setDoc(doc(db, "users", uid, "amis", user.uid), t);   // …et toi dans la sienne
+    await loadFriends();
+    const f = friends.find(f => f.uid === uid);
+    aMsg = `🎉 ${f ? f.pseudo : "Ton ami"} est maintenant ton ami !`;
+  } catch(e){ aMsg = say(e); }
+  renderAmis();
+}
+async function removeFriend(uid){
+  try {
+    await deleteDoc(doc(db, "users", user.uid, "amis", uid));
+    await deleteDoc(doc(db, "users", uid, "amis", user.uid)).catch(()=>{});
+    friends = friends.filter(f => f.uid !== uid); aMsg = "";
+  } catch(e){ aMsg = say(e); }
+  sureRm = null; renderAmis();
+}
+
+function renderAmis(){
+  if (!vA || !vA.classList.contains("on")) return;
+  const msg = aMsg ? `<p class="amsg">${esc(aMsg)}</p>` : "";
+  if (!user){
+    vA.innerHTML = `<h2 class="atitle">Amis</h2><div class="card acard"><p>☁️ Connecte-toi d'abord (sur l'Accueil) pour ajouter des amis et voir le classement.</p>
+      <button class="btn" id="aGoHome">Aller à l'Accueil</button></div>`;
+    document.getElementById("aGoHome").onclick = () => document.querySelector('.tab[data-v="home"]').click();
+    return;
+  }
+  if (!profLoaded){ vA.innerHTML = `<h2 class="atitle">Amis</h2><div class="card acard"><p>Chargement… ⏳</p>${msg}</div>`; return; }
+  if (!prof){
+    const def = (user.displayName || "").split(" ")[0];
+    vA.innerHTML = `<h2 class="atitle">Amis</h2><div class="card acard"><p><b>Choisis ton pseudo</b> : c'est le nom que tes amis verront dans le classement.</p>
+      <input class="ain" id="aPseudo" maxlength="16" placeholder="ton pseudo" value="${esc(def)}">
+      <button class="btn" id="aPseudoOk">C'est parti !</button>${msg}</div>`;
+    document.getElementById("aPseudoOk").onclick = async () => {
+      const p = document.getElementById("aPseudo").value.trim().slice(0,16);
+      if (p.length < 2){ aMsg = "Ton pseudo doit faire au moins 2 lettres."; renderAmis(); return; }
+      aMsg = "Je crée ton code ami…"; renderAmis();
+      try { await createProfile(p); aMsg = ""; } catch(e){ aMsg = say(e); }
+      renderAmis();
+    };
+    return;
+  }
+  // ----- classement -----
+  const m = moisNow();
+  const val = st => { const s = st && st[aSport]; if (!s) return { km: 0, n: 0 };
+    if (aPer === "mois") return st.mois === m ? { km: s.kmMois, n: s.nMois } : { km: 0, n: 0 };
+    return { km: s.km, n: s.n }; };
+  const rows = [{ uid: user.uid, pseudo: prof.pseudo, stats: prof.stats, me: true }, ...friends]
+    .map(f => ({ ...f, v: val(f.stats) })).sort((a,b) => b.v.km - a.v.km);
+  const medal = i => ["🥇","🥈","🥉"][i] || `<span class="rk">${i+1}</span>`;
+  const list = rows.map((f,i) => `<div class="arow${f.me ? " me" : ""}"><span class="am">${medal(i)}</span><span class="an">${esc(f.pseudo || "???")}${f.me ? " <i>(toi)</i>" : ""}</span>
+      <span class="av"><b>${km1(f.v.km)} km</b><small>${f.v.n} ${aSport === "run" ? "course" : "sortie"}${f.v.n > 1 ? "s" : ""}</small></span></div>`).join("");
+  const alone = friends.length ? "" : `<p class="hint">Ajoute un ami avec son code pour faire la course avec lui 🏁</p>`;
+  const flist = friends.map(f => `<div class="frow"><span>${esc(f.pseudo || "???")}</span>
+      <button class="rm${sureRm === f.uid ? " sure" : ""}" data-u="${esc(f.uid)}">${sureRm === f.uid ? "Sûr ? Retirer" : "Retirer"}</button></div>`).join("");
+  vA.innerHTML = `<h2 class="atitle">Amis</h2>
+    <div class="card acard">
+      <div class="seg" id="aSp"><button data-v="run" class="${aSport==="run"?"on":""}">🏃 Course</button><button data-v="bike" class="${aSport==="bike"?"on":""}">🚴 Vélo</button></div>
+      <div class="seg sm" id="aPer"><button data-v="mois" class="${aPer==="mois"?"on":""}">Ce mois-ci</button><button data-v="tout" class="${aPer==="tout"?"on":""}">Depuis toujours</button></div>
+      <div class="alist">${list}</div>${alone}
+    </div>
+    <div class="card acard">
+      <p class="lbl2">Mon code ami</p>
+      <div class="mycode">${esc(prof.code)}</div>
+      <button class="btn" id="aShare">Envoyer mon code à un ami</button>
+    </div>
+    <div class="card acard">
+      <p class="lbl2">Ajouter un ami</p>
+      <div class="addrow"><input class="ain" id="aCode" maxlength="6" placeholder="CODE" autocapitalize="characters" autocomplete="off"><button class="btn" id="aAdd">Ajouter</button></div>
+      ${msg}
+    </div>
+    ${friends.length ? `<div class="card acard"><p class="lbl2">Mes amis</p>${flist}</div>` : ""}
+    <p class="hint">Ton pseudo : <b>${esc(prof.pseudo)}</b></p>`;
+  vA.querySelectorAll("#aSp button").forEach(b => b.onclick = () => { aSport = b.dataset.v; renderAmis(); });
+  vA.querySelectorAll("#aPer button").forEach(b => b.onclick = () => { aPer = b.dataset.v; renderAmis(); });
+  document.getElementById("aAdd").onclick = () => addFriend(document.getElementById("aCode").value);
+  document.getElementById("aShare").onclick = async () => {
+    const url = location.origin + location.pathname + "?ami=" + prof.code;
+    const text = `Ajoute-moi dans Une petite course ! Mon code ami : ${prof.code}`;
+    try { if (navigator.share) { await navigator.share({ title: "Une petite course", text, url }); return; } } catch(e){ return; }
+    try { await navigator.clipboard.writeText(text + " " + url); aMsg = "Code copié ! Colle-le dans un message 📋"; } catch(e){ aMsg = "Ton code : " + prof.code; }
+    renderAmis();
+  };
+  vA.querySelectorAll(".rm").forEach(b => b.onclick = () => { const u = b.dataset.u; if (sureRm === u) removeFriend(u); else { sureRm = u; renderAmis(); } });
+}
+window.renderAmis = () => { aMsg = aMsg.startsWith("🎉") ? aMsg : ""; sureRm = null;
+  if (user && prof && friendsLoaded) loadFriends().then(renderAmis); renderAmis(); };
+
 box.hidden = true;
 onAuthStateChanged(auth, u => {
   user = u; ready = false; cloudIds = new Set(); mode = "start"; formErr = ""; menu = 0;
-  if (u) loadCloud(); else draw();
+  prof = null; profLoaded = false; friends = []; friendsLoaded = false; aMsg = "";
+  if (u) loadCloud(); else { draw(); renderAmis(); }
 });
 </script>
 </body>
