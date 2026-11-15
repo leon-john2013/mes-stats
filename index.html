@@ -78,6 +78,20 @@
   .acct .two{display:flex;gap:8px}.acct .two button{flex:1;background:var(--blue);color:#fff}
   .acct .two button.alt{background:var(--card2);color:var(--txt)}
   .acct .err{color:#ff9db0;margin:8px 0 0;font-size:14px}
+  .hero{position:relative}
+  .flagbox{position:relative;display:flex;justify-content:flex-end;margin:-4px 0 6px;z-index:20}
+  .flagbtn{background:none;border:0;padding:6px;margin:-6px;cursor:pointer;display:block;-webkit-tap-highlight-color:transparent}
+  .flagbtn svg{width:44px;height:35px;display:block}
+  .flagbtn.on svg{filter:drop-shadow(0 0 6px #00e5ff88)}
+  .flagbtn.wait svg{opacity:.6}
+  .flagbtn.bad svg{filter:drop-shadow(0 0 6px #ff4d6d)}
+  .flagbox .pop{position:absolute;right:0;top:44px;width:250px;background:var(--card);border:2px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 12px 30px #000a;font:600 15px Nunito,sans-serif;color:var(--txt)}
+  .flagbox .pop p{margin:0 0 12px;line-height:1.35}
+  .flagbox .pop .err{color:#ff9db0}
+  .flagbox .two{display:flex;gap:8px}
+  .flagbox .two button{flex:1;border:0;border-radius:14px;padding:11px 8px;font:700 14px Fredoka,Nunito,sans-serif;cursor:pointer}
+  .flagbox .alt{background:var(--card2);color:var(--txt)}
+  .flagbox .danger{background:#ff4d6d;color:#fff}
   .bigbtn{display:flex;align-items:center;gap:16px;width:100%;border:2px solid var(--line);background:var(--card);color:var(--txt);border-radius:22px;padding:22px 20px;font:800 24px Fredoka,Nunito,sans-serif;cursor:pointer;text-align:left;transition:transform .1s,border-color .2s,box-shadow .2s}
   .bigbtn:active{transform:scale(.98)}
   .bigbtn .e{width:76px;display:flex;justify-content:center;flex:none}
@@ -976,15 +990,44 @@ async function loadCloud(){
 }
 
 // ----- affichage -----
-let mode = "start", formErr = "";
-function draw(){
-  if (user){
-    const name = user.displayName ? user.displayName.split(" ")[0] : (user.email || "");
-    const state = lastErr ? `<span class="err" style="margin:0">⚠️ ${esc(lastErr)}</span>` : ready ? `☁️ <b>${esc(name)}</b>, tes sorties sont sauvegardées` : `☁️ Je récupère tes sorties…`;
-    box.innerHTML = `<div class="row"><div class="who">${state}</div><button class="out" id="aOut">Se déconnecter</button></div>`;
-    document.getElementById("aOut").onclick = () => signOut(auth);
-    return;
+// les deux drapeaux à damier : en couleur quand tu es connecté, gris sinon
+const FLAGS = on => { const st = on ? "#00e5ff" : "#5f6b8f", fill = on ? "url(#chkB)" : "url(#chkG)";
+  return `<svg viewBox="0 0 28 22" aria-hidden="true"><defs><pattern id="chkG" width="4.8" height="4.8" patternUnits="userSpaceOnUse"><rect width="4.8" height="4.8" fill="#9aa3bd"/><rect width="2.4" height="2.4" fill="#4a5578"/><rect x="2.4" y="2.4" width="2.4" height="2.4" fill="#4a5578"/></pattern></defs><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 2 Q4.5 .6 1 2.6 L3.2 9.6 Q6.8 7.6 10.4 7.8 Z" fill="${fill}" stroke="${st}" stroke-width="1"/>
+    <path d="M20 2 Q23.5 .6 27 2.6 L24.8 9.6 Q21.2 7.6 17.6 7.8 Z" fill="${fill}" stroke="${st}" stroke-width="1"/>
+    <path d="M8 2 L16 21 M20 2 L12 21" stroke="${st}" stroke-width="2"/></g></svg>`; };
+const flagBox = document.createElement("div"); flagBox.className = "flagbox";
+document.querySelector("#v-home .hero").prepend(flagBox);
+
+let mode = "start", formErr = "", menu = 0;   // menu : 0 fermé, 1 choix, 2 « tu es sûr ? »
+function drawFlags(){
+  const on = !!user;
+  let pop = "";
+  if (on && menu === 1){
+    const name = user.displayName || user.email || "";
+    const st = lastErr ? `<p class="err">⚠️ ${esc(lastErr)}</p>` : `<p>☁️ Connecté : <b>${esc(name)}</b><br>${ready ? "Tes sorties sont sauvegardées." : "Je récupère tes sorties…"}</p>`;
+    pop = `<div class="pop">${st}<div class="two"><button class="alt" data-a="cancel">Annuler</button><button class="danger" data-a="ask">Se déconnecter</button></div></div>`;
+  } else if (on && menu === 2){
+    pop = `<div class="pop"><p>Tu es sûr de vouloir te déconnecter ?</p><div class="two"><button class="alt" data-a="cancel">Annuler</button><button class="danger" data-a="out">Oui, me déconnecter</button></div></div>`;
   }
+  flagBox.innerHTML = `<button class="flagbtn${on ? " on" : ""}${on && (lastErr || !ready) ? " wait" : ""}${on && lastErr ? " bad" : ""}" aria-label="${on ? "Compte" : "Pas connecté"}">${FLAGS(on)}</button>${pop}`;
+  flagBox.querySelector(".flagbtn").onclick = () => {
+    if (!on){ box.scrollIntoView({behavior:"smooth", block:"center"}); return; }
+    menu = menu ? 0 : 1; drawFlags();
+  };
+  flagBox.querySelectorAll(".pop button").forEach(b => b.onclick = () => {
+    const a = b.dataset.a;
+    if (a === "cancel") menu = 0; else if (a === "ask") menu = 2; else if (a === "out"){ menu = 0; signOut(auth); }
+    drawFlags();
+  });
+}
+flagBox.addEventListener("click", e => e.stopPropagation());
+document.addEventListener("click", () => { if (menu){ menu = 0; drawFlags(); } });
+
+function draw(){
+  drawFlags();
+  if (user){ box.hidden = true; box.innerHTML = ""; return; }
+  box.hidden = false;
   if (mode === "mail"){
     box.innerHTML = `<p>Connexion avec un e-mail</p>
       <input id="aMail" type="email" autocomplete="email" placeholder="ton e-mail">
@@ -1009,9 +1052,9 @@ function draw(){
   document.getElementById("aM").onclick = () => { mode = "mail"; formErr = ""; draw(); };
 }
 
-box.innerHTML = `<p style="margin:0">☁️ …</p>`;
+box.hidden = true;
 onAuthStateChanged(auth, u => {
-  user = u; ready = false; cloudIds = new Set(); mode = "start"; formErr = "";
+  user = u; ready = false; cloudIds = new Set(); mode = "start"; formErr = ""; menu = 0;
   if (u) loadCloud(); else draw();
 });
 </script>
