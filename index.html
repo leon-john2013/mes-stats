@@ -27,6 +27,9 @@
   }
   :root.mauve{--bg:#13061f; --card:#200b38; --card2:#2d114f; --line:#45207a; --glow:#5a1a8a66; --nav:#170828eb}
   [hidden]{display:none!important}
+  .card.one > :first-child{margin-top:0}
+  svg.flg{display:inline-block!important;height:1.35em!important;width:auto!important;vertical-align:-.22em;margin-right:4px;filter:drop-shadow(0 0 3px rgba(0,229,255,.45))}
+  .flg.m{filter:drop-shadow(0 0 3px rgba(190,110,255,.55))}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0}
   body{background:radial-gradient(1200px 600px at 80% -10%,var(--glow),transparent),var(--bg);background-attachment:fixed;color:var(--txt);font-family:Nunito,system-ui,sans-serif;font-size:15px;min-height:100vh}
@@ -153,6 +156,10 @@
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <pattern id="chkB" width="4.8" height="4.8" patternUnits="userSpaceOnUse"><rect width="4.8" height="4.8" fill="#eaf1ff"/><rect width="2.4" height="2.4" fill="#2f7bff"/><rect x="2.4" y="2.4" width="2.4" height="2.4" fill="#2f7bff"/></pattern>
+  <pattern id="chkM" width="4.8" height="4.8" patternUnits="userSpaceOnUse"><rect width="4.8" height="4.8" fill="#f3e0ff"/><rect width="2.4" height="2.4" fill="#9d4dff"/><rect x="2.4" y="2.4" width="2.4" height="2.4" fill="#9d4dff"/></pattern>
+</defs></svg>
 <div class="wrap">
 
   <!-- ACCUEIL -->
@@ -381,7 +388,32 @@
   const save = () => { try { localStorage.setItem(LS, JSON.stringify(sessions)); } catch(e){} };
 
   // ---------- on enlève les fausses stats d'exemple ----------
-  if (sessions.some(s=>s.demo)) { sessions = sessions.filter(s=>!s.demo); save(); }
+  // ---------- fausses stats d'exemple (ajoutées une seule fois) ----------
+  const DEMO_KEY = "sport-stats-leon-demo2";
+  function demoTrack(seed, km){
+    let x = seed; const r = () => (x = x*48271 % 2147483647) / 2147483647;
+    const lat0 = 50.6 + r()*0.3, lon0 = 4.2 + r()*0.6, R = km/(2*Math.PI)/111, n = 120, wob = [r(),r(),r()];
+    const t = [];
+    for (let i=0;i<=n;i++){
+      const a = i/n*2*Math.PI, f = 1 + .25*Math.sin(3*a+wob[0]*6) + .12*Math.sin(5*a+wob[1]*6);
+      t.push([+(lat0 + R*f*Math.sin(a)).toFixed(5), +(lon0 + R*1.5*f*Math.cos(a+wob[2])).toFixed(5)]);
+    }
+    return t;
+  }
+  try {
+    if (!localStorage.getItem(DEMO_KEY)) {
+      const ago = n => { const d = new Date(); d.setDate(d.getDate()-n); return new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
+      const ex = [
+        ["run",52,3.2,1260,"Premier essai 😅"],["run",45,4.1,1500,""],["run",38,5.0,1740,"Mon premier 5 km !"],
+        ["run",30,4.6,1530,"Avec papa"],["run",24,6.2,2130,""],["run",17,5.5,1800,"Il pleuvait 🌧️"],
+        ["run",10,7.4,2520,"Record de distance"],["run",4,5.1,1590,"Très rapide aujourd'hui ⚡"],
+        ["bike",49,12.5,2700,"Balade tranquille"],["bike",35,18.2,3600,""],["bike",28,22.4,4200,"Avec les copains"],
+        ["bike",21,15.8,2880,"Beaucoup de vent 💨"],["bike",13,31.0,5700,"Grosse sortie !"],["bike",6,24.6,4320,""]
+      ];
+      ex.forEach(([sp,d,km,sec,note],i)=>sessions.push({ id: 1000+i, sport:sp, date: ago(d), km, sec, note, demo:true, track: demoTrack(7919*(i+3), km) }));
+      localStorage.setItem(DEMO_KEY, "1"); save();
+    }
+  } catch(e){}
 
   // ---------- outils ----------
   const fmtKm = n => (Math.round(n*10)/10).toLocaleString("fr-BE");
@@ -396,6 +428,18 @@
   const today = () => { const d = new Date(); return new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10); };
   const mondayOf = d => { const x = new Date(d); x.setHours(12,0,0,0); x.setDate(x.getDate()-(x.getDay()+6)%7); return x; };
   const NAME = { run:"course", bike:"sortie vélo" };
+  // deux petits drapeaux à damier croisés : bleus pour les stats globales, mauves pour une sortie
+  const flags = m => `<svg class="flg${m?" m":""}" viewBox="0 0 28 22" aria-hidden="true"><g stroke-linecap="round" stroke-linejoin="round">
+    <path d="M8 2 Q4.5 .6 1 2.6 L3.2 9.6 Q6.8 7.6 10.4 7.8 Z" fill="url(#${m?"chkM":"chkB"})" stroke="${m?"#d18cff":"#00e5ff"}" stroke-width="1"/>
+    <path d="M20 2 Q23.5 .6 27 2.6 L24.8 9.6 Q21.2 7.6 17.6 7.8 Z" fill="url(#${m?"chkM":"chkB"})" stroke="${m?"#d18cff":"#00e5ff"}" stroke-width="1"/>
+    <path d="M8 2 L16 21 M20 2 L12 21" stroke="${m?"#d18cff":"#00e5ff"}" stroke-width="2"/></g></svg>`;
+  // chrono, petit coureur et petit cycliste, dans le même style
+  const ic = (m, vb, body) => `<svg class="flg${m?" m":""}" viewBox="${vb}" aria-hidden="true"><g fill="none" stroke-linecap="round" stroke-linejoin="round">${body(m?"#d18cff":"#00e5ff", m?"#9d4dff":"#2f7bff")}</g></svg>`;
+  const chrono = m => ic(m, "0 0 22 22", (a,b)=>`<path d="M9 1.5 H13 M11 1.5 V4 M17.2 5.6 L18.8 4" stroke="${a}" stroke-width="2"/><circle cx="11" cy="12.5" r="8" fill="${b}" stroke="${a}" stroke-width="2"/><path d="M11 12.5 L11 7.8 M11 12.5 L14 14.3" stroke="#fff" stroke-width="1.8"/>`);
+  const runner = m => ic(m, "0 0 22 22", (a,b)=>`<circle cx="13.5" cy="3.2" r="2.3" fill="${a}" stroke="none"/><path d="M12.6 6.5 L10.6 12.5" stroke="${b}" stroke-width="3.4"/><path d="M12.4 7.5 L15.5 10 L18 8.6 M12 7.6 L8.6 6.6 L6.6 9.4 M10.6 12.5 L14.2 15.2 L13.4 20 M10.6 12.5 L7.6 16.6 L3.6 16" stroke="${a}" stroke-width="1.9"/>`);
+  const cyclist = m => ic(m, "0 0 26 22", (a,b)=>`<circle cx="6" cy="16" r="4.6" stroke="${a}" stroke-width="1.8"/><circle cx="20" cy="16" r="4.6" stroke="${a}" stroke-width="1.8"/><path d="M6 16 L10 10 L17 10 L20 16 M10 10 L13 16 L17 10" stroke="${b}" stroke-width="1.8"/><circle cx="17.5" cy="3" r="2.2" fill="${a}" stroke="none"/><path d="M10.5 8 Q13 4.6 16.6 6 L18.6 9" stroke="${a}" stroke-width="2.2"/><path d="M11 8.5 L14 12 L13 16" stroke="${a}" stroke-width="1.8"/>`);
+  const trophy = m => ic(m, "0 0 22 22", (a,b)=>`<path d="M6 3 H16 V8.5 Q16 13.5 11 13.5 Q6 13.5 6 8.5 Z" fill="${b}" stroke="${a}" stroke-width="1.8"/><path d="M6 5 H3.2 Q3 9.4 6.6 10 M16 5 H18.8 Q19 9.4 15.4 10" stroke="${a}" stroke-width="1.6"/><path d="M11 13.5 V17 M7 19.5 H15 L14 17 H8 Z" stroke="${a}" stroke-width="1.8" fill="${a}"/><path d="M8.6 5.6 V8.4" stroke="#fff" stroke-width="1.4"/>`);
+  const spdIcon = (sp, m) => sp==="run" ? runner(m) : cyclist(m);
 
   // ---------- onglets ----------
   function show(v){
@@ -449,9 +493,9 @@
     const {km, sec} = readForm();
     const boxes = [];
     if ($("date").value) boxes.push(["Date", fmtDate($("date").value)]);
-    if (km>0) boxes.push(["Distance", fmtKm(km)+" km"]);
-    if (sec>0) boxes.push(["Durée", fmtDur(sec)]);
-    if (km>0 && sec>0) boxes.push([sport==="run"?"Allure":"Vitesse", sport==="run"?pace(sec,km):speed(sec,km)]);
+    if (km>0) boxes.push([flags()+"Distance", fmtKm(km)+" km"]);
+    if (sec>0) boxes.push([chrono()+"Durée", fmtDur(sec)]);
+    if (km>0 && sec>0) boxes.push([spdIcon(sport)+(sport==="run"?"Allure":"Vitesse"), sport==="run"?pace(sec,km):speed(sec,km)]);
     $("pvBoxes").innerHTML = boxes.map(([l,v])=>`<div class="pv"><div class="lab">${l}</div><div class="v">${v}</div></div>`).join("");
   }
   ["dist","hh","mm","ss"].forEach(id=>$(id).addEventListener("input", updatePreview));
@@ -606,9 +650,9 @@
       const fastPool = isRun ? L.filter(s=>s.km>=1) : L;
       const fastest = fastPool.length ? fastPool.reduce((a,b)=> (b.km/b.sec)>(a.km/a.sec)?b:a) : null;
       head = `<div class="shead"><h2>${title}</h2></div>`;
-      kpis = [["Distance totale", `${fmtKm(km)}<small>km</small>`],[isRun?"Courses":"Sorties", L.length],["Temps total", fmtDur(sec)],[isRun?"Allure moyenne":"Vitesse moyenne", isRun?pace(sec,km):speed(sec,km)]];
+      kpis = [[flags()+"Distance totale", `${fmtKm(km)}<small>km</small>`],[isRun?"Courses":"Sorties", L.length],[chrono()+"Temps total", fmtDur(sec)],[spdIcon(sp)+(isRun?"Allure moyenne":"Vitesse moyenne"), isRun?pace(sec,km):speed(sec,km)]];
       recTitle = "Mes records";
-      recs = [["Plus longue", fmtKm(longest.km)+" km"],[isRun?"Meilleure allure":"Plus rapide", fastest?effort(fastest):"–"]];
+      recs = [[flags()+"Plus longue", fmtKm(longest.km)+" km"],[spdIcon(sp)+(isRun?"Meilleure allure":"Plus rapide"), fastest?effort(fastest):"–"]];
     } else {
       const n = L.length;
       const rankKm = [...L].sort((a,b)=>b.km-a.km).findIndex(x=>x.id===one.id)+1;
@@ -616,38 +660,47 @@
       const avg = L.reduce((a,x)=>a+x.km,0)/n, diff = one.km-avg;
       const d = new Date(one.date+"T12:00").toLocaleDateString("fr-BE",{weekday:"short",day:"numeric",month:"short"});
       head = `<div class="shead"><h2>${isRun?"🏃 Course":"🚴 Sortie"} · ${d}</h2><button class="xbtn" id="xbtn" aria-label="Retour aux stats globales">✕</button></div>`;
-      kpis = [["Distance", `${fmtKm(one.km)}<small>km</small>`],["Classement", `${rankKm}<small>/${n}</small>`],["Durée", fmtDur(one.sec)],[isRun?"Allure":"Vitesse moyenne", effort(one)]];
+      kpis = [[flags(1)+"Distance", `${fmtKm(one.km)}<small>km</small>`],[flags(1)+trophy(1)+"Classement distance", `${rankKm}<small>/${n}</small>`, spdIcon(sp,1)+trophy(1)+(isRun?"Classement allure":"Classement vitesse"), `${rankSpd}<small>/${n}</small>`],[chrono(1)+"Durée", fmtDur(one.sec)],[spdIcon(sp,1)+(isRun?"Allure":"Vitesse moyenne"), effort(one)]];
       recTitle = "Comparée aux autres";
-      recs = [["Rang vitesse", `${rankSpd}/${n}`],["Par rapport à ta moyenne", (diff>=0?"+":"−")+fmtKm(Math.abs(diff))+" km"],[isRun?"Vitesse moyenne":"Allure", isRun?speed(one.sec,one.km):pace(one.sec,one.km)]];
+      recs = [[flags(1)+"Par rapport à ta moyenne", (diff>=0?"+":"−")+fmtKm(Math.abs(diff))+" km"],[(isRun?cyclist(1):runner(1))+(isRun?"Vitesse moyenne":"Allure"), isRun?speed(one.sec,one.km):pace(one.sec,one.km)]];
       const tags = [];
       if (n>1 && rankKm===1) tags.push("🏆 Ta plus longue !");
       if (n>1 && rankSpd===1) tags.push(isRun?"⚡ Ta meilleure allure !":"⚡ Ta plus rapide !");
       extra = `${tags.length?`<div class="tags">${tags.map(t=>`<span>${t}</span>`).join("")}</div>`:""}${one.note?`<div class="dnote">💬 ${esc(one.note)}</div>`:""}<button class="btn ghost" id="delBtn">Supprimer cette ${isRun?"course":"sortie"}</button>`;
     }
     const got = BADGES[sp].filter(b=>b[2](L)), hidden = BADGES[sp].length - got.length;
+    const recKm = L.reduce((a,b)=>b.km>a.km?b:a).id, recSec = L.reduce((a,b)=>b.sec>a.sec?b:a).id;
+    const spdPool = isRun ? L.filter(s=>s.km>=1) : L;
+    const recSpd = spdPool.length ? spdPool.reduce((a,b)=>(b.km/b.sec)>(a.km/a.sec)?b:a).id : null;
+    const marks = s => (s.id===recKm?flags(!!one):"") + (s.id===recSec?chrono(!!one):"") + (s.id===recSpd?spdIcon(sp,!!one):"");
     const items = [...L].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).map(s=>`
       <button class="item ${one&&one.id===s.id?"sel":""}" data-id="${s.id}">
-        <div class="main"><div class="t">${fmtKm(s.km)} km · ${fmtDur(s.sec)}</div>
+        <div class="main"><div class="t">${fmtKm(s.km)} km · ${fmtDur(s.sec)} ${marks(s)}</div>
         <div class="s">${fmtDate(s.date)} · ${effort(s)}${s.note?` · ${esc(s.note)}`:""}</div></div>
         <span class="chev">›</span>
       </button>`).join("");
     el.innerHTML = head + (msg?`<div class="msg" style="text-align:left">${msg}</div>`:"") + `
-      ${one?"":`<div class="card chart" style="margin-top:14px"><h3>Mes km des 8 dernières semaines</h3>${chart(L,color)}</div>`}
-      <div class="kpis">${kpis.map(([l,v])=>`<div class="card kpi ${one?"one":""}"><div class="lab">${l}</div><div class="big">${roll(v)}</div></div>`).join("")}</div>
+      ${one?"":`<div class="card chart" style="margin-top:14px"><h3>${flags()}Mes km des 8 dernières semaines</h3>${chart(L,color)}</div>`}
+      <div class="kpis">${kpis.map(([l,v,l2,v2])=>`<div class="card kpi ${one?"one":""}"><div class="lab">${l}</div><div class="big">${roll(v)}</div>${l2?`<div class="lab" style="margin-top:10px">${l2}</div><div class="big">${roll(v2)}</div>`:""}</div>`).join("")}</div>
       <div class="stack" style="margin-top:14px">
         ${one ? `<div class="card"><h3>Mon parcours 🗺️</h3>${one.track && one.track.length>1
             ? `<div class="map"></div><div class="maplegend"><span><i style="background:#1f8bff"></i>Départ</span><span><i style="background:#00e5ff"></i>Arrivée</span></div>`
             : `<div class="nomap">Pas de carte pour cette ${isRun?"course":"sortie"} : elle n'a pas été importée avec un fichier GPX. Les prochaines que tu importes auront leur carte ! 📂</div>`}</div>`
           : ""}
-        <div class="card ${one?"one":""}"><h3>${recTitle}</h3><div class="records">${recs.map(([l,v])=>`<div class="rec"><div class="lab">${l}</div><div class="v">${roll(v)}</div></div>`).join("")}</div>${extra}</div>
+        ${one ? `<div class="card one">${extra}</div>` : `<div class="card"><h3>${recTitle}</h3><div class="records">${recs.map(([l,v])=>`<div class="rec"><div class="lab">${l}</div><div class="v">${roll(v)}</div></div>`).join("")}</div></div>`}
         <div class="card"><h3>Mes badges 🏅</h3><div class="badges">${got.map(([e,t])=>`<div class="badge got"><span class="e">${e}</span>${t}</div>`).join("")}</div>${hidden?`<div class="secret">🎁 Encore ${hidden} badge${hidden>1?"s":""} secret${hidden>1?"s":""} à découvrir…</div>`:`<div class="secret">🏆 Tu as tous les badges, champion !</div>`}</div>
         <div class="card"><h3>Toutes mes ${isRun?"courses":"sorties"}</h3>${items}</div>
+        ${sessions.some(x=>x.demo)?`<button class="btn ghost" id="demoBtn">🧹 Enlever les fausses stats d'exemple</button>`:""}
       </div>`;
     el.querySelectorAll(".item").forEach(b=>b.addEventListener("click", ()=>{
       focus[sp] = +b.dataset.id; sureDel = false;
       window.scrollTo({top:0, behavior:"smooth"});
       renderStats(sp, true);
     }));
+    if ($("demoBtn")) $("demoBtn").addEventListener("click", ()=>{
+      if ($("demoBtn").dataset.sure!=="1"){ $("demoBtn").dataset.sure="1"; $("demoBtn").textContent = "Appuie encore pour confirmer"; $("demoBtn").classList.add("danger"); return; }
+      sessions = sessions.filter(x=>!x.demo); save(); focus[sp] = null; renderStats(sp, true);
+    });
     if ($("xbtn")) $("xbtn").addEventListener("click", ()=>{ focus[sp] = null; renderStats(sp, true); });
     if ($("delBtn")) $("delBtn").addEventListener("click", ()=>{
       if (!sureDel){ sureDel = true; $("delBtn").textContent = "Appuie encore pour confirmer"; $("delBtn").classList.add("danger"); return; }
