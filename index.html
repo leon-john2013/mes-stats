@@ -26,6 +26,7 @@
     --run:#2f7bff; --bike:#00e5ff; --blue:#3d8bff;
   }
   :root.mauve{--bg:#13061f; --card:#200b38; --card2:#2d114f; --line:#45207a; --glow:#5a1a8a66; --nav:#170828eb}
+  [hidden]{display:none!important}
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
   html,body{margin:0}
   body{background:radial-gradient(1200px 600px at 80% -10%,var(--glow),transparent),var(--bg);background-attachment:fixed;color:var(--txt);font-family:Nunito,system-ui,sans-serif;font-size:15px;min-height:100vh}
@@ -139,6 +140,8 @@
   .map{height:260px;border-radius:14px;overflow:hidden;background:#071233;border:1px solid var(--line)}
   .map > svg{width:100%;height:100%;display:block}
   .leaflet-container{background:#071233;font-family:Nunito,sans-serif}
+  /* plan des rues aux couleurs de l'appli : rues claires sur fond bleu nuit */
+  .leaflet-tile-pane{filter:invert(1) hue-rotate(195deg) brightness(.95) contrast(1.05) saturate(1.6)}
   .leaflet-control-attribution{background:rgba(5,11,31,.7)!important;color:#8aa0d6!important;font-size:9px!important}
   .leaflet-control-attribution a{color:#8aa0d6!important}
   .leaflet-bar a{background:#0d1736!important;color:#cfe3ff!important;border-color:#1c2f66!important}
@@ -296,11 +299,11 @@
         <h3 id="checkTitle">Ta sortie</h3>
         <div class="row" id="pvBoxes"></div>
         <div class="fields">
-          <div class="row">
+          <div class="row" id="lockRow" hidden>
             <label>Date<input type="date" id="date"></label>
             <label>Distance (km)<input type="number" id="dist" min="0.1" step="0.01" inputmode="decimal"></label>
           </div>
-          <label>Durée (h · min · s)
+          <label id="durField">Durée (h · min · s)
             <div class="dur">
               <input type="number" id="hh" min="0" placeholder="h" inputmode="numeric">
               <input type="number" id="mm" min="0" max="59" placeholder="min" inputmode="numeric">
@@ -405,6 +408,11 @@
   document.querySelectorAll(".tab").forEach(t=>t.addEventListener("click", ()=>{
     // changer d'onglet ferme la sortie ouverte : on revient aux stats globales
     focus.run = null; focus.bike = null; sureDel = false;
+    // quand on revient sur l'accueil depuis un autre onglet, rien n'est sélectionné
+    if (t.dataset.v==="home" && !$("v-home").classList.contains("on")){
+      sport = null; document.querySelectorAll(".bigbtn").forEach(x=>x.classList.remove("on"));
+      $("panel").hidden = true; resetPanel();
+    }
     show(t.dataset.v);
   }));
 
@@ -413,7 +421,8 @@
   function resetPanel(){
     pendingTrack = null;
     $("step-import").hidden = false; $("step-check").hidden = true;
-    ["dist","hh","mm","ss","note"].forEach(id=>$(id).value="");
+    ["date","dist","hh","mm","ss","note"].forEach(id=>$(id).value="");
+    $("durField").hidden = false;
     $("pvBoxes").innerHTML = ""; $("msg").textContent = "";
   }
   document.querySelectorAll(".bigbtn").forEach(b=>b.addEventListener("click", ()=>{
@@ -439,6 +448,7 @@
   function updatePreview(){
     const {km, sec} = readForm();
     const boxes = [];
+    if ($("date").value) boxes.push(["Date", fmtDate($("date").value)]);
     if (km>0) boxes.push(["Distance", fmtKm(km)+" km"]);
     if (sec>0) boxes.push(["Durée", fmtDur(sec)]);
     if (km>0 && sec>0) boxes.push([sport==="run"?"Allure":"Vitesse", sport==="run"?pace(sec,km):speed(sec,km)]);
@@ -472,8 +482,9 @@
       $("dist").value = Math.round(km*100)/100;
       if (sec>0){ $("hh").value = Math.floor(sec/3600) || ""; $("mm").value = Math.floor(sec%3600/60); $("ss").value = sec%60; }
       if (times.length){ const d = new Date(times[0]); $("date").value = new Date(d - d.getTimezoneOffset()*60000).toISOString().slice(0,10); }
+      $("durField").hidden = sec>0;   // la durée se tape seulement si le GPS ne l'a pas notée
       openCheck(sport==="run" ? "🏃 Ta course est lue !" : "🚴 Ta sortie est lue !");
-      $("msg").textContent = sec>0 ? "Vérifie, puis appuie sur Enregistrer 👍" : "Ajoute la durée, puis Enregistrer 👍";
+      $("msg").textContent = sec>0 ? "Ajoute un commentaire si tu veux, puis appuie sur Enregistrer 👍" : "Le GPS n'a pas noté le temps : ajoute la durée, puis Enregistrer 👍";
     }catch(err){ $("msg").textContent = "Je n'arrive pas à lire ce fichier 😕"; }
     e.target.value = "";
   });
@@ -697,6 +708,7 @@
     const plan = isDemo ? fakePlan(track, id) : null;
     if (window.L && L.map){
       try{
+        box.innerHTML = "";
         mapObj = L.map(box, { zoomControl:true, attributionControl:true, scrollWheelZoom:false });
         mapObj.attributionControl.setPrefix('<a href="https://leafletjs.com">Leaflet</a>');
         if (plan){
@@ -706,10 +718,17 @@
           L.svgOverlay(el, plan.bounds).addTo(mapObj);
           mapObj.attributionControl.addAttribution("Plan inventé pour l'exemple");
         } else {
-          L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
-            maxZoom:19, subdomains:"abcd",
-            attribution:'© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a>'
+          // plan détaillé (rues, ronds-points, noms) ; si ça ne charge pas, on passe au plan OpenStreetMap
+          const osm = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>';
+          const tiles = L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+            maxZoom:19, subdomains:"abcd", attribution: osm+' © <a href="https://carto.com/">CARTO</a>'
           }).addTo(mapObj);
+          let fails = 0, m = mapObj;
+          tiles.on("tileerror", ()=>{
+            if (++fails !== 4 || m !== mapObj) return;
+            m.removeLayer(tiles);
+            L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution: osm }).addTo(m);
+          });
         }
         L.polyline(track, { color:TRACK_GLOW, weight:9, opacity:.95 }).addTo(mapObj);
         const line = L.polyline(track, { color:TRACK, weight:5, opacity:1, lineJoin:"round", smoothFactor:0.5 }).addTo(mapObj);
@@ -719,6 +738,14 @@
         mapObj.fitBounds(line.getBounds(), { padding:[24,24] });
         return;
       }catch(e){ mapObj = null; }
+    }
+    // Leaflet n'a pas chargé : on essaie une 2e adresse, puis on redessine la carte
+    if (!window.L && !drawMap.retry){
+      drawMap.retry = true;
+      const css = document.createElement("link"); css.rel="stylesheet"; css.href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"; document.head.appendChild(css);
+      const js = document.createElement("script"); js.src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js";
+      js.onload = ()=>{ if (document.body.contains(box)) drawMap(box, track, color, isDemo, id); };
+      document.head.appendChild(js);
     }
     // sans internet : on dessine juste le tracé (et le faux plan pour les exemples)
     const la = track.map(p=>p[0]), lo = track.map(p=>p[1]);
